@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Panel 1</title>
+    <style>
+        /* Estilos CSS para el panel */
+        #letras-panel {
+            position: fixed;
+            top: 10px;
+            left: 10px; /* Cambiamos "right" a "left" para la parte superior izquierda */
+            background-color: turquoise;
+            padding: 10px;
+            border: 1px solid red;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            display: grid; /* Usamos display: grid para organizar las letras */
+            grid-template-columns: repeat(3, 1fr); /* Tres columnas */
+            gap: 5px; /* Espacio entre las letras */
+        }
+
+        li {
+            font-size: 24px;
+            text-align: center; /* Centrar el texto dentro de cada letra */
+        }
+    </style>
+</head>
+<body>
+    <div id="letras-panel">
+        <h2>Panel letras 1</h2>
+        <ul id="letras-lista">
+            <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
+        </ul>
+    </div>
+
+    <script>
+        // Letras que se mostrarán en el panel
+        const letras = ["A", "B", "C", "D", "E", "F"];
+
+        // Función para crear y agregar elementos <li> al panel
+        function crearListaLetras() {
+            const letrasLista = document.getElementById("letras-lista");
+            letras.forEach(letra => {
+                const listItem = document.createElement("li");
+                listItem.textContent = letra;
+                letrasLista.appendChild(listItem);
+            });
+        }
+
+        // Llamar a la función para crear la lista de letras
+        crearListaLetras();
+    </script>
+</body>
+</html>
