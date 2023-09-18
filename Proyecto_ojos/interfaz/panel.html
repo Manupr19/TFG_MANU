@@ -1,56 +1,148 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Panel 1</title>
+    <title>Paneles de Letras</title>
     <style>
         /* Estilos CSS para el panel */
         #letras-panel {
-            position: fixed;
-            top: 10px;
-            left: 10px; /* Cambiamos "right" a "left" para la parte superior izquierda */
             background-color: turquoise;
             padding: 10px;
             border: 1px solid red;
         }
 
+        #letras-panel2 {
+            background-color: lightblue;
+            padding: 10px;
+            border: 1px solid blue;
+        }
+
+        #letras-panel3 {
+            background-color: cadetblue;
+            padding: 10px;
+            border: 1px solid yellow;
+        }
+
+        #letras-panel4 {
+            background-color: lightblue;
+            padding: 10px;
+            border: 1px solid blue;
+        }
+
+        #letras-panel5 {
+            background-color: lightblue;
+            padding: 10px;
+            border: 1px solid blue;
+        }
+
+        #letras-panel6 {
+            background-color: lightblue;
+            padding: 10px;
+            border: 1px solid blue;
+        }
+
         ul {
             list-style-type: none;
             padding: 0;
-            display: grid; /* Usamos display: grid para organizar las letras */
-            grid-template-columns: repeat(3, 1fr); /* Tres columnas */
-            gap: 5px; /* Espacio entre las letras */
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
         }
 
         li {
             font-size: 24px;
-            text-align: center; /* Centrar el texto dentro de cada letra */
+            text-align: center;
         }
     </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
 </head>
+
 <body>
-    <div id="letras-panel">
-        <h2>Panel letras 1</h2>
-        <ul id="letras-lista">
-            <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
-        </ul>
+<br><br>
+    <div class="row gx-5 ">
+
+        <div id="letras-panel" class="col-lg-2 offset-lg-1 col-sm-3 offset-sm-1">
+            <h2>Panel letras 1</h2>
+            <ul id="letras-lista">
+                <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
+            </ul>
+        </div>
+
+        <div id="letras-panel" class="col-lg-2 offset-lg-2 col-sm-3 offset-sm-1">
+            <h2>Panel letras 2</h2>
+            <ul id="letras-lista2">
+                <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
+            </ul>
+        </div>
+
+        <div id="letras-panel" class="col-lg-2 offset-lg-2 col-sm-3 offset-sm-1">
+            <h2>Panel letras 3</h2>
+            <ul id="letras-lista3">
+                <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
+            </ul>
+        </div>
+
+    </div>
+<br><br><br><br><br>
+    <div class="row gx-5 ">
+        <div id="letras-panel4" class="col-lg-2 offset-lg-1 col-sm-3 offset-sm-1">
+            <h2>Panel letras 4</h2>
+            <ul id="letras-lista4">
+                <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
+            </ul>
+        </div>
+
+        <div id="letras-panel5" class="col-lg-2 offset-lg-2 col-sm-3 offset-sm-1">
+            <h2>Panel letras 5</h2>
+            <ul id="letras-lista5">
+                <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
+            </ul>
+        </div>
+
+        <div id="letras-panel6" class="col-lg-2 offset-lg-2 col-sm-3 offset-sm-1">
+            <h2>Panel letras 6</h2>
+            <ul id="letras-lista6">
+                <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
+            </ul>
+        </div>
     </div>
 
+
+
     <script>
-        // Letras que se mostrarán en el panel
-        const letras = ["A", "B", "C", "D", "E", "F"];
+        // Letras para cada panel
+        const paneles = [
+            ["A", "B", "C", "D", "E", "F"],
+            ["G", "H", "I", "J", "K", "L"],
+            ["M", "N", "Ñ", "O", "P", "Q"],
+            ["R", "S", "T", "U", "V", "Z"],
+            ["0", "1", "2", "3", "4", "5"],
+            ["6", "7", "8", "9", "\u00AE", "\u00A9"] // Los caracteres especiales deben estar escapados
+        ];
 
         // Función para crear y agregar elementos <li> al panel
-        function crearListaLetras() {
-            const letrasLista = document.getElementById("letras-lista");
-            letras.forEach(letra => {
+        function crearListaLetras(panelIndex, ulId) {
+            const letrasLista = document.getElementById(ulId);
+            letrasLista.innerHTML = ""; // Limpiar el contenido anterior
+            paneles[panelIndex - 1].forEach(letra => {
                 const listItem = document.createElement("li");
                 listItem.textContent = letra;
                 letrasLista.appendChild(listItem);
             });
         }
 
-        // Llamar a la función para crear la lista de letras
-        crearListaLetras();
+        // Llamar a la función para crear la lista de letras para el primer panel
+        crearListaLetras(1, "letras-lista");
+        crearListaLetras(2, "letras-lista2");
+        crearListaLetras(3, "letras-lista3");
+        crearListaLetras(4, "letras-lista4");
+        crearListaLetras(5, "letras-lista5");
+        crearListaLetras(6, "letras-lista6"); 
     </script>
 </body>
+
 </html>
