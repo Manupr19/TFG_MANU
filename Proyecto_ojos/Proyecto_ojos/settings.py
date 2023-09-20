@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'interfaz',
+    'entrenamiento',
 ]
 
 MIDDLEWARE = [
@@ -51,10 +53,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'Proyecto_ojos.urls'
 
+import os
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'Proyecto_ojos/Templates')],  # Agrega una coma aquí
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

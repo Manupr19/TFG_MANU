@@ -15,9 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from interfaz.views import panel_view
+from interfaz.views import panel_view as panel
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('panel/', panel_view, name='panel_view'),
+    path('panel/', panel, name='panel_view'),
 ]
