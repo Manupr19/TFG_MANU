@@ -16,8 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from interfaz.views import panel_view as panel
-
+from entrenamiento.views import entrenador_views as entrenador
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('panel/', panel, name='panel_view'),
+    path('entrenamiento/', entrenador, name='entrenador_view'),
+
 ]
