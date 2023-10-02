@@ -5,40 +5,11 @@
     <title>Paneles de Letras</title>
     <style>
         /* Estilos CSS para el panel */
-        #letras-panel {
+        .letras-panel {
             background-color: turquoise;
             padding: 10px;
             border: 1px solid red;
-        }
-
-        #letras-panel2 {
-            background-color: lightblue;
-            padding: 10px;
-            border: 1px solid blue;
-        }
-
-        #letras-panel3 {
-            background-color: cadetblue;
-            padding: 10px;
-            border: 1px solid yellow;
-        }
-
-        #letras-panel4 {
-            background-color: lightblue;
-            padding: 10px;
-            border: 1px solid blue;
-        }
-
-        #letras-panel5 {
-            background-color: lightblue;
-            padding: 10px;
-            border: 1px solid blue;
-        }
-
-        #letras-panel6 {
-            background-color: lightblue;
-            padding: 10px;
-            border: 1px solid blue;
+            cursor: pointer;
         }
 
         ul {
@@ -46,14 +17,97 @@
             padding: 0;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
+            gap: 20px;
+            
         }
 
         li {
-            font-size: 24px;
+            font-size: 45px;
             text-align: center;
         }
+
+        .panel-ampliado {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+        }
+        /* Estilos para las letras en el contenido ampliado */
+        .letras-lista li {
+            font-size: 36px; /* Tamaño de fuente más grande */
+            margin-bottom: 10px; /* Espaciado entre letras */
+            gap: 100px;
+            display: flex; /* Usar flexbox para centrar verticalmente */
+            align-items: center; /* Centrar verticalmente el contenido */
+        }
+        .contenido-ampliado {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border: 1px solid black;
+            text-align: center;
+        }
+
+        /* Estilos para las letras en el contenido ampliado */
+        .contenido-ampliado li {
+            font-size: 36px;
+            /* Tamaño de fuente más grande */
+            margin-bottom: 10px;
+            /* Espaciado entre letras */
+            gap: 100px;
+        }
+
+        /* Estilos para las letras en el contenido ampliado */
+        .contenido-ampliado li {
+            font-size: 36px;
+            /* Tamaño de fuente más grande */
+            margin-bottom: 10px;
+            /* Espaciado entre letras */
+            gap: 100px;
+        }
+
+        /* Estilos para las letras solo cuando el panel ampliado está activo */
+        .panel-ampliado .contenido-ampliado li {
+            font-size: 48px;
+            /* Tamaño de fuente más grande cuando el panel ampliado está activo */
+            margin-bottom: 15px;
+            /* Espaciado entre letras cuando el panel ampliado está activo */
+            gap: 100px;
+        }
+
+        .top-panels-container {
+            position: absolute;
+            top: 5%;
+            width: 100%;
+            /* Asegura que ocupe todo el ancho */
+        }
+
+        .bottom-panels-container {
+            position: absolute;
+            bottom: 5%;
+            width: 100%;
+            /* Asegura que ocupe todo el ancho */
+        }
+
+        .middel-panels-container{
+            position: absolute;
+            top: 45%;
+            width: 100%;
+        }
+
+        
     </style>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
@@ -62,56 +116,75 @@
 </head>
 
 <body>
-<br><br>
-    <div class="row gx-5 ">
+    <br><br>
+    <div class="row gx-5 top-panels-container">
 
-        <div id="letras-panel" class="col-lg-2 offset-lg-1 col-sm-3 offset-sm-1">
-            <h2>Panel letras 1</h2>
-            <ul id="letras-lista">
+        <div class="letras-panel col-lg-2 offset-lg-1 col-sm-3 offset-sm-1" data-panel-index="1">
+            <h2>Panel 1</h2>
+            <ul class="letras-lista" data-lista-index="1">
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
         </div>
 
-        <div id="letras-panel" class="col-lg-2 offset-lg-2 col-sm-3 offset-sm-1">
-            <h2>Panel letras 2</h2>
-            <ul id="letras-lista2">
+        <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="2">
+            <h2>Panel  2</h2>
+            <ul class="letras-lista" data-lista-index="2">
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
         </div>
 
-        <div id="letras-panel" class="col-lg-2 offset-lg-2 col-sm-3 offset-sm-1">
-            <h2>Panel letras 3</h2>
-            <ul id="letras-lista3">
+        <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="3">
+            <h2>Panel 3</h2>
+            <ul class="letras-lista" data-lista-index="3">
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
         </div>
 
     </div>
-<br><br><br><br><br>
-    <div class="row gx-5 ">
-        <div id="letras-panel4" class="col-lg-2 offset-lg-1 col-sm-3 offset-sm-1">
-            <h2>Panel letras 4</h2>
-            <ul id="letras-lista4">
+
+    <div class="row gx-5 middel-panels-container">
+
+
+
+        <div class="    offset-lg-4 col-lg-6 col-sm-3 offset-sm-1" data-panel-index="2">
+            <h2>aqui ira la palabra seleccionada</h2>
+        </div>
+
+
+
+    </div>
+
+    <div class="row gx-5 bottom-panels-container">
+        <div class="letras-panel col-lg-2 offset-lg-1 col-sm-3 offset-sm-1" data-panel-index="4">
+            <h2>Panel 4</h2>
+            <ul class="letras-lista" data-lista-index="4">
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
         </div>
 
-        <div id="letras-panel5" class="col-lg-2 offset-lg-2 col-sm-3 offset-sm-1">
-            <h2>Panel letras 5</h2>
-            <ul id="letras-lista5">
+        <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="5">
+            <h2>Panel 5</h2>
+            <ul class="letras-lista" data-lista-index="5">
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
         </div>
 
-        <div id="letras-panel6" class="col-lg-2 offset-lg-2 col-sm-3 offset-sm-1">
-            <h2>Panel letras 6</h2>
-            <ul id="letras-lista6">
+        <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="6">
+            <h2>Panel 6</h2>
+            <ul class="letras-lista" data-lista-index="6">
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
         </div>
     </div>
 
-
+    <!-- Contenedor grande -->
+    <div class="panel-ampliado" id="panel-ampliado">
+        <div class="contenido-ampliado">
+            <ul class="letras-lista" id="letras-lista-ampliada">
+                <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
+            </ul>
+        </div>
+    </div>
 
     <script>
         // Letras para cada panel
@@ -126,7 +199,7 @@
 
         // Función para crear y agregar elementos <li> al panel
         function crearListaLetras(panelIndex, ulId) {
-            const letrasLista = document.getElementById(ulId);
+            const letrasLista = document.querySelector(`ul.letras-lista[data-lista-index="${panelIndex}"]`);
             letrasLista.innerHTML = ""; // Limpiar el contenido anterior
             paneles[panelIndex - 1].forEach(letra => {
                 const listItem = document.createElement("li");
@@ -135,13 +208,50 @@
             });
         }
 
-        // Llamar a la función para crear la lista de letras para el primer panel
-        crearListaLetras(1, "letras-lista");
-        crearListaLetras(2, "letras-lista2");
-        crearListaLetras(3, "letras-lista3");
-        crearListaLetras(4, "letras-lista4");
-        crearListaLetras(5, "letras-lista5");
-        crearListaLetras(6, "letras-lista6"); 
+        // Llamar a la función para crear la lista de letras para todos los paneles
+        for (let i = 1; i <= 6; i++) {
+            crearListaLetras(i, `letras-lista${i}`);
+        }
+
+        // Función para mostrar el contenido ampliado
+        function mostrarContenidoAmpliado(panelIndex) {
+            const letrasLista = paneles[panelIndex - 1];
+            const letrasListaAmpliada = document.getElementById("letras-lista-ampliada");
+            const contenidoAmpliado = document.getElementById("panel-ampliado");
+
+            letrasListaAmpliada.innerHTML = ""; // Limpiar el contenido anterior
+
+            letrasLista.forEach(letra => {
+                const listItem = document.createElement("li");
+                listItem.textContent = letra;
+                letrasListaAmpliada.appendChild(listItem);
+            });
+
+            contenidoAmpliado.style.display = "block";
+        }
+
+        // Función para ocultar el contenido ampliado
+        function ocultarContenidoAmpliado() {
+            const contenidoAmpliado = document.getElementById("panel-ampliado");
+            contenidoAmpliado.style.display = "none";
+        }
+
+        // Asignar el evento de clic a cada panel
+        const panelesClick = document.querySelectorAll(".letras-panel");
+        panelesClick.forEach(panel => {
+            const panelIndex = panel.getAttribute("data-panel-index");
+            panel.addEventListener("click", () => {
+                //mostrarContenidoAmpliado(panelIndex);
+                //****aqui deberia abrirse la pantalla asociada al panel 
+            });
+        });
+
+        // Asignar el evento de clic al fondo oscuro para ocultar el contenido ampliado
+        const panelAmpliado = document.getElementById("panel-ampliado");
+        panelAmpliado.addEventListener("click", () => {
+            ocultarContenidoAmpliado();
+        });
+
     </script>
 </body>
 
