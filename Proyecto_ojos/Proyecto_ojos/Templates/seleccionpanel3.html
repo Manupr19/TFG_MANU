@@ -1,12 +1,9 @@
-
 <!DOCTYPE html>
-
 <html>
 
 <head>
-    <title>Paneles de Letras</title>
+    <title>Panel 3</title>
     <style>
-        
         /* Estilos CSS para el panel */
         .letras-panel {
             background-color: turquoise;
@@ -124,21 +121,16 @@
 
         <div class="letras-panel col-lg-2 offset-lg-1 col-sm-3 offset-sm-1" data-panel-index="1">
             <h2>Panel 1</h2>
-            
             <ul class="letras-lista" data-lista-index="1">
-                
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
-            <button onclick="tomarFotos(1)">Tomar Fotos</button>
         </div>
-      
 
         <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="2">
             <h2>Panel  2</h2>
             <ul class="letras-lista" data-lista-index="2">
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
-            <button onclick="tomarFotos(2)">Tomar Fotos</button>
         </div>
 
         <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="3">
@@ -146,7 +138,6 @@
             <ul class="letras-lista" data-lista-index="3">
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
-            <button onclick="tomarFotos(3)">Tomar Fotos</button>
         </div>
 
     </div>
@@ -156,7 +147,7 @@
 
 
         <div class="    offset-lg-4 col-lg-6 col-sm-3 offset-sm-1" data-panel-index="2">
-            <h2>ENTRENADOR</h2>
+            <h2>aqui ira la palabra seleccionada</h2>
         </div>
 
 
@@ -169,7 +160,6 @@
             <ul class="letras-lista" data-lista-index="4">
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
-            <button onclick="tomarFotos(4)">Tomar Fotos</button>
         </div>
 
         <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="5">
@@ -177,7 +167,6 @@
             <ul class="letras-lista" data-lista-index="5">
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
-            <button onclick="tomarFotos(5)">Tomar Fotos</button>
         </div>
 
         <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="6">
@@ -185,7 +174,6 @@
             <ul class="letras-lista" data-lista-index="6">
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
-            <button onclick="tomarFotos(6)">Tomar Fotos</button>
         </div>
     </div>
 
@@ -201,12 +189,12 @@
     <script>
         // Letras para cada panel
         const paneles = [
-            ["A", "B", "C", "D", "E", "F"],
-            ["G", "H", "I", "J", "K", "L"],
-            ["M", "N", "Ñ", "O", "P", "Q"],
-            ["R", "S", "T", "U", "V", "Z"],
-            ["0", "1", "2", "3", "4", "5"],
-            ["6", "7", "8", "9", "\u00AE", "\u00A9"] // Los caracteres especiales deben estar escapados
+            ["M"],
+            ["N"],
+            ["Ñ"],
+            ["O"],
+            ["P"],
+            ["Q"] 
         ];
 
         // Función para crear y agregar elementos <li> al panel
@@ -248,9 +236,6 @@
             contenidoAmpliado.style.display = "none";
         }
 
-      
-
-
         // Asignar el evento de clic a cada panel
         const panelesClick = document.querySelectorAll(".letras-panel");
         panelesClick.forEach(panel => {
@@ -266,78 +251,6 @@
         panelAmpliado.addEventListener("click", () => {
             ocultarContenidoAmpliado();
         });
-
-        async function tomarFotos(panelIndex) {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-
-        const video = document.createElement('video');
-        document.body.appendChild(video);
-        video.srcObject = stream;
-        await video.play();
-
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-
-        for (let i = 0; i < 3; i++) {
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const dataURL = canvas.toDataURL('image/jpeg');
-
-            // Enviar la foto al servidor Django
-            enviarFotoAlServidor(dataURL, panelIndex, i);
-
-            await new Promise(resolve => setTimeout(resolve, 100)); // Espera 0.1 segundo entre cada foto
-        }
-
-        stream.getTracks().forEach(track => track.stop());
-        document.body.removeChild(video);
-    } catch (error) {
-        console.error('Error al acceder a la cámara o tomar fotos: ', error);
-    }
-}
-
-function enviarFotoAlServidor(dataURL, panelIndex, fotoIndex) {
-    const formData = new FormData();
-    formData.append('image', dataURL);
-    formData.append('panelIndex', panelIndex);
-    formData.append('fotoIndex', fotoIndex);
-
-    // Crear un formulario oculto y agregar los datos
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '../entrenamiento/';
-    form.style.display = 'none';
-    form.enctype = 'multipart/form-data'; // Asegura que se manejen correctamente los datos binarios
-
-    // Agregar el token CSRF al formulario
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    const csrfInput = document.createElement('input');
-    csrfInput.type = 'hidden';
-    csrfInput.name = 'csrfmiddlewaretoken';
-    csrfInput.value = csrfToken;
-
-    // Agregar los campos del formulario al formulario oculto
-    form.appendChild(csrfInput);
-
-    for (const [key, value] of formData.entries()) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = value;
-        form.appendChild(input);
-    }
-
-    // Agregar el formulario al cuerpo del documento y enviarlo
-    document.body.appendChild(form);
-    form.submit();
-
-    // Eliminar el formulario después de enviarlo
-    document.body.removeChild(form);
-}
-
-
-
-
 
     </script>
 </body>
