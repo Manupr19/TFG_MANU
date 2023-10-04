@@ -1,4 +1,6 @@
+
 <!DOCTYPE html>
+
 <html>
 
 <head>
@@ -240,12 +242,13 @@
             contenidoAmpliado.style.display = "block";
         }
 
-        /*// Función para ocultar el contenido ampliado
+        // Función para ocultar el contenido ampliado
         function ocultarContenidoAmpliado() {
             const contenidoAmpliado = document.getElementById("panel-ampliado");
             contenidoAmpliado.style.display = "none";
         }
-      */
+
+      
 
 
         // Asignar el evento de clic a cada panel
@@ -258,13 +261,13 @@
             });
         });
 
-       /* // Asignar el evento de clic al fondo oscuro para ocultar el contenido ampliado
+        // Asignar el evento de clic al fondo oscuro para ocultar el contenido ampliado
         const panelAmpliado = document.getElementById("panel-ampliado");
         panelAmpliado.addEventListener("click", () => {
             ocultarContenidoAmpliado();
         });
-*/
-async function tomarFotos(panelIndex) {
+
+        async function tomarFotos(panelIndex) {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
 
@@ -276,52 +279,64 @@ async function tomarFotos(panelIndex) {
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
 
-        const fotos = [];
-
         for (let i = 0; i < 3; i++) {
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             const dataURL = canvas.toDataURL('image/jpeg');
-            fotos.push(dataURL);
+
+            // Enviar la foto al servidor Django
+            enviarFotoAlServidor(dataURL, panelIndex, i);
+
             await new Promise(resolve => setTimeout(resolve, 100)); // Espera 0.1 segundo entre cada foto
-        }
-
-        // Envía las fotos al servidor Django
-        const formData = new FormData();
-        fotos.forEach((dataURL, i) => {
-            const blob = dataURItoBlob(dataURL);
-            formData.append(`imagen${i + 1}`, blob, `panel${panelIndex}_foto${i + 1}.jpg`);
-        });
-
-        // Realiza una solicitud POST al servidor Django para guardar las imágenes
-        const response = await fetch('../guardar_imagenes/', {
-            method: 'POST',
-            body: formData,
-        });
-
-        if (response.ok) {
-            console.log('Imágenes guardadas exitosamente en el servidor.');
-        } else {
-            console.error('Error al guardar las imágenes en el servidor.');
         }
 
         stream.getTracks().forEach(track => track.stop());
         document.body.removeChild(video);
     } catch (error) {
-        console.error('Error al acceder a la cámara: ', error);
+        console.error('Error al acceder a la cámara o tomar fotos: ', error);
     }
 }
 
-// Función para convertir una data URL en un Blob
-function dataURItoBlob(dataURI) {
-    const byteString = atob(dataURI.split(',')[1]);
-    const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-    for (let i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
+function enviarFotoAlServidor(dataURL, panelIndex, fotoIndex) {
+    const formData = new FormData();
+    formData.append('image', dataURL);
+    formData.append('panelIndex', panelIndex);
+    formData.append('fotoIndex', fotoIndex);
+
+    // Crear un formulario oculto y agregar los datos
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '../entrenamiento/';
+    form.style.display = 'none';
+    form.enctype = 'multipart/form-data'; // Asegura que se manejen correctamente los datos binarios
+
+    // Agregar el token CSRF al formulario
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrfmiddlewaretoken';
+    csrfInput.value = csrfToken;
+
+    // Agregar los campos del formulario al formulario oculto
+    form.appendChild(csrfInput);
+
+    for (const [key, value] of formData.entries()) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = value;
+        form.appendChild(input);
     }
-    return new Blob([ab], { type: mimeString });
+
+    // Agregar el formulario al cuerpo del documento y enviarlo
+    document.body.appendChild(form);
+    form.submit();
+
+    // Eliminar el formulario después de enviarlo
+    document.body.removeChild(form);
 }
+
+
+
 
 
     </script>
