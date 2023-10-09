@@ -5,3 +5,6 @@ from django.shortcuts import render
 def panel_view(request):
     
     return render(request, 'panel.html')
+
+def inicio_view(request):
+    return render(request, 'Inicio.html')
