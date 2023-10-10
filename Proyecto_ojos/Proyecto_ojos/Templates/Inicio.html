@@ -12,6 +12,7 @@
         /* Personaliza el fondo de la página */
         body {
             background-color: #f0f0f0; /* Cambia el color de fondo según tus preferencias */
+            position: relative; /* Establece la posición relativa para permitir superposiciones */
         }
 
         /* Personaliza los cuadros de color turquesa */
@@ -27,14 +28,23 @@
         .turquoise-box h4 {
             color: #ffffff; /* Cambia el color del texto según tus preferencias */
         }
+
+        /* Estilo para la imagen en la parte inferior */
+        .bottom-image {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
     </style>
+    
 </head>
 <body>
 
 <div class="container mt-5">
     <div class="row">
         <div class="col-md-4 text-center mb-3">
-            <a href="pagina1.html"> <!-- Cambia "pagina1.html" por la URL de tu primera página -->
+            <a href="/login"> 
                 <div class="turquoise-box">
                     <i class="fas fa-sign-in-alt fa-5x"></i>
                     <h4>Iniciar sesión</h4>
@@ -42,7 +52,7 @@
             </a>
         </div>
         <div class="col-md-4 text-center mb-3">
-            <a href="pagina2.html"> <!-- Cambia "pagina2.html" por la URL de tu segunda página -->
+            <a href="/entrenamiento"> 
                 <div class="turquoise-box">
                     <i class="fas fa-dumbbell fa-5x"></i>
                     <h4>Entrenamiento</h4>
@@ -50,7 +60,7 @@
             </a>
         </div>
         <div class="col-md-4 text-center mb-3">
-            <a href="pagina3.html"> <!-- Cambia "pagina3.html" por la URL de tu tercera página -->
+            <a href="pagina3.html">
                 <div class="turquoise-box">
                     <i class="fas fa-play-circle fa-5x"></i>
                     <h4>Iniciar aplicación</h4>
@@ -67,13 +77,18 @@
                 frontend con tecnologías actuales.</p>
         </div>
     </div>
-</div>
 
-<!-- Agrega enlaces a las bibliotecas de Bootstrap y Font Awesome para los iconos -->
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
+    <!-- Agrega enlaces a las bibliotecas de Bootstrap y Font Awesome para los iconos -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
+    
+  
+    <img class="bottom-image" src="https://www.uhu.es/etsi/wp-content/uploads/2016/02/membrete_ETSI.jpg" alt="Manuel Ángel Pazos Ruiz" style="max-width: 500px; max-height: 200px; position: relative; bottom: 20px; left: 50%; transform: translateX(-50%);">
+    <p style="text-align: center;">© 2023 Manuel Ángel Pazos Ruiz</p>
+
+</div>
 
 </body>
 </html>

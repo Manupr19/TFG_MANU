@@ -8,3 +8,6 @@ def panel_view(request):
 
 def inicio_view(request):
     return render(request, 'Inicio.html')
+
+def login_view(request):
+    return render(request, 'login.html')
