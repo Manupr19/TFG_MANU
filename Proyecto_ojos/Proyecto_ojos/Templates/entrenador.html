@@ -299,11 +299,18 @@ async function tomarFotos(panelIndex) {
             formData.append(`imagen${i + 1}`, blob, `panel${panelIndex}_foto${i + 1}.jpg`);
         });
 
-        // Realiza una solicitud POST al servidor Django para guardar las imágenes
-        const response = await fetch('../guardar_imagenes/', {
+
+        const panelNumero = panelIndex; // Reemplaza 1 con el valor que desees
+
+
+        // Agrega tus archivos a formData aquí...
+        formData.append('panel_numero', panelNumero);
+        const response = await fetch(`../guardar_imagenes/`, {
             method: 'POST',
             body: formData,
         });
+
+
 
         if (response.ok) {
             console.log('Imágenes guardadas exitosamente en el servidor.');

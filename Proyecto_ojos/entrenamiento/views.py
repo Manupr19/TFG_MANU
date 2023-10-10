@@ -30,22 +30,29 @@ def crear_directorios_view(request):
     crea_directorios()
     return HttpResponse("Directorios creados con éxito")
 
+
 @csrf_exempt
 def guardar_imagenes(request):
     if request.method == 'POST':
         try:
+            # Accede al parámetro "panel_numero" desde el cuerpo de la solicitud POST
+            panel_numero = request.POST.get('panel_numero')
+
             # Asegúrate de que la carpeta "fotos" existe en la aplicación "entrenamiento"
             fotos_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fotos')
-            if not os.path.exists(fotos_dir):
-                os.makedirs(fotos_dir)
 
-            # Guarda las imágenes en la carpeta "fotos"
+            # Crea una subcarpeta dentro de "fotos" con el nombre "panel+numero"
+            panel_dir = os.path.join(fotos_dir, f'panel{panel_numero}')
+            if not os.path.exists(panel_dir):
+                os.makedirs(panel_dir)
+
+            # Guarda las imágenes en la subcarpeta correspondiente
             for key, file in request.FILES.items():
-                with open(os.path.join(fotos_dir, file.name), 'wb') as destination:
+                with open(os.path.join(panel_dir, file.name), 'wb') as destination:
                     for chunk in file.chunks():
                         destination.write(chunk)
 
-            return JsonResponse({'message': 'Imágenes guardadas correctamente.'})
+            return JsonResponse({'message': f'Imágenes guardadas correctamente en la carpeta panel{panel_numero}'})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
