@@ -4,7 +4,6 @@
 <head>
     <title>Paneles de Letras</title>
     <style>
-        
         /* Estilos CSS para el panel */
         .letras-panel {
             background-color: turquoise;
@@ -19,7 +18,6 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
-            
         }
 
         li {
@@ -37,6 +35,7 @@
             background-color: rgba(0, 0, 0, 0.7);
             z-index: 999;
         }
+
         /* Estilos para las letras en el contenido ampliado */
         .letras-lista li {
             font-size: 36px; /* Tamaño de fuente más grande */
@@ -45,6 +44,7 @@
             display: flex; /* Usar flexbox para centrar verticalmente */
             align-items: center; /* Centrar verticalmente el contenido */
         }
+
         .contenido-ampliado {
             display: flex;
             justify-content: center;
@@ -105,8 +105,6 @@
             top: 45%;
             width: 100%;
         }
-
-        
     </style>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -119,24 +117,34 @@
 <body>
     <br><br>
     <div class="row gx-5 top-panels-container">
-
         <div class="letras-panel col-lg-2 offset-lg-1 col-sm-3 offset-sm-1" data-panel-index="1">
             <h2>Panel 1</h2>
-            
             <ul class="letras-lista" data-lista-index="1">
-                
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
             <button onclick="tomarFotos(1)">Tomar Fotos</button>
+            <div id="resultado-detector">
+                {% if caras_detectadas == 1 %}
+                    <i class="fas fa-check-circle" style="color: green;"></i> Caras detectadas correctamente
+                {% elif caras_detectadas == 0 %}
+                    <i class="fas fa-times-circle" style="color: red;"></i> Al menos una cara no se detectó en las imágenes
+                {% endif %}
+            </div>
         </div>
-      
 
         <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="2">
-            <h2>Panel  2</h2>
+            <h2>Panel 2</h2>
             <ul class="letras-lista" data-lista-index="2">
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
             <button onclick="tomarFotos(2)">Tomar Fotos</button>
+            <div id="resultado-detector">
+                {% if caras_detectadas == 1 %}
+                    <i class="fas fa-check-circle" style="color: green;"></i> Caras detectadas correctamente
+                {% elif caras_detectadas == 0 %}
+                    <i class="fas fa-times-circle" style="color: red;"></i> Al menos una cara no se detectó en las imágenes
+                {% endif %}
+            </div>
         </div>
 
         <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="3">
@@ -145,27 +153,26 @@
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
             <button onclick="tomarFotos(3)">Tomar Fotos</button>
+            <div id="resultado-detector">
+                {% if caras_detectadas == 1 %}
+                    <i class="fas fa-check-circle" style="color: green;"></i> Caras detectadas correctamente
+                {% elif caras_detectadas == 0 %}
+                    <i class="fas fa-times-circle" style="color: red;"></i> Al menos una cara no se detectó en las imágenes
+                {% endif %}
+            </div>
         </div>
-
     </div>
 
     <div class="row gx-5 middel-panels-container">
-
-
-
         <div class="    offset-lg-4 col-lg-6 col-sm-3 offset-sm-1" data-panel-index="2">
             <h2>ENTRENADOR</h2>
-            <a href="/inicio"> 
+            <a href="/inicio">
                 <div class="turquoise-box">
                     <i class="fas fa-sign-in-alt fa-5x"></i>
                     <h4>Atras</h4>
                 </div>
             </a>
         </div>
-        
-
-
-
     </div>
 
     <div class="row gx-5 bottom-panels-container">
@@ -175,6 +182,13 @@
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
             <button onclick="tomarFotos(4)">Tomar Fotos</button>
+            <div id="resultado-detector">
+                {% if caras_detectadas == 1 %}
+                    <i class="fas fa-check-circle" style="color: green;"></i> Caras detectadas correctamente
+                {% elif caras_detectadas == 0 %}
+                    <i class="fas fa-times-circle" style="color: red;"></i> Al menos una cara no se detectó en las imágenes
+                {% endif %}
+            </div>
         </div>
 
         <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="5">
@@ -183,6 +197,13 @@
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
             <button onclick="tomarFotos(5)">Tomar Fotos</button>
+            <div id="resultado-detector">
+                {% if caras_detectadas == 1 %}
+                    <i class="fas fa-check-circle" style="color: green;"></i> Caras detectadas correctamente
+                {% elif caras_detectadas == 0 %}
+                    <i class="fas fa-times-circle" style="color: red;"></i> Al menos una cara no se detectó en las imágenes
+                {% endif %}
+            </div>
         </div>
 
         <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="6">
@@ -191,6 +212,13 @@
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
             <button onclick="tomarFotos(6)">Tomar Fotos</button>
+            <div id="resultado-detector">
+                {% if caras_detectadas == 1 %}
+                    <i class="fas fa-check-circle" style="color: green;"></i> Caras detectadas correctamente
+                {% elif caras_detectadas == 0 %}
+                    <i class="fas fa-times-circle" style="color: red;"></i> Al menos una cara no se detectó en las imágenes
+                {% endif %}
+            </div>
         </div>
     </div>
 
@@ -247,14 +275,6 @@
             contenidoAmpliado.style.display = "block";
         }
 
-        /*// Función para ocultar el contenido ampliado
-        function ocultarContenidoAmpliado() {
-            const contenidoAmpliado = document.getElementById("panel-ampliado");
-            contenidoAmpliado.style.display = "none";
-        }
-      */
-
-
         // Asignar el evento de clic a cada panel
         const panelesClick = document.querySelectorAll(".letras-panel");
         panelesClick.forEach(panel => {
@@ -265,59 +285,89 @@
             });
         });
 
-       /* // Asignar el evento de clic al fondo oscuro para ocultar el contenido ampliado
-        const panelAmpliado = document.getElementById("panel-ampliado");
-        panelAmpliado.addEventListener("click", () => {
-            ocultarContenidoAmpliado();
-        });
-*/
+ // Esta función toma fotos desde la cámara, las envía al servidor Django
+// para su procesamiento y realiza el entrenamiento.
 async function tomarFotos(panelIndex) {
     try {
+        // Acceder a la cámara
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
 
+        // Crear un elemento de video para mostrar el flujo de la cámara
         const video = document.createElement('video');
         document.body.appendChild(video);
         video.srcObject = stream;
         await video.play();
 
+        // Crear un lienzo (canvas) para capturar y procesar las imágenes
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
 
         const fotos = [];
 
+        // Capturar 3 fotos con un intervalo de 0.5 segundos entre cada una
         for (let i = 0; i < 3; i++) {
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             const dataURL = canvas.toDataURL('image/jpeg');
             fotos.push(dataURL);
-            await new Promise(resolve => setTimeout(resolve, 100)); // Espera 0.1 segundo entre cada foto
+            await new Promise(resolve => setTimeout(resolve, 500)); // Espera 0.5 segundos entre cada foto
         }
 
-        // Envía las fotos al servidor Django
+        // Enviar las fotos al servidor Django
         const formData = new FormData();
         fotos.forEach((dataURL, i) => {
             const blob = dataURItoBlob(dataURL);
             formData.append(`imagen${i + 1}`, blob, `panel${panelIndex}_foto${i + 1}.jpg`);
         });
 
+        const panelNumero = panelIndex;
 
-        const panelNumero = panelIndex; // Reemplaza 1 con el valor que desees
-
-
-        // Agrega tus archivos a formData aquí...
+        // Agregar información adicional al formulario
         formData.append('panel_numero', panelNumero);
-        const response = await fetch(`../guardar_imagenes/`, {
+
+        // Enviar el formulario al servidor para guardar las imágenes
+        const guardarImagenesResponse = await fetch(`../guardar_imagenes/`, {
             method: 'POST',
             body: formData,
-        });
+        }).then(response => response.json());
+
+        if (guardarImagenesResponse.success) {
+            // Una vez que se guardan las imágenes, ejecutar la detección de caras
+            const tomarFotosResponse = await fetch('/tomarfotos', {
+                method: 'POST',
+            }).then(response => response.json());
+
+            if (tomarFotosResponse.deteccion_exitosa) {
+                console.log('Se detectó una cara en todas las imágenes capturadas.');
+
+          // Agregar el número de panel al formulario
+            formData.append('panel_numero', panelNumero);
+
+            // Enviar el formulario al servidor para entrenamiento
+            const entrenamientoResponse = await fetch('/entrena', {
+                method: 'POST',
+                body: formData, // El formulario ahora incluye el número de panel
+            }).then(response => response.json());
+
+            if (entrenamientoResponse.entrenamiento_exitoso) {
+                console.log('Entrenamiento exitoso.');
+            } else {
+                console.error('Error en el entrenamiento:', entrenamientoResponse.mensaje);
+            }
 
 
-
-        if (response.ok) {
-            console.log('Imágenes guardadas exitosamente en el servidor.');
+                if (entrenamientoResponse.entrenamiento_exitoso) {
+                    console.log('Entrenamiento exitoso.');
+                } else {
+                    console.error('Error en el entrenamiento:', entrenamientoResponse.mensaje);
+                }
+            } else {
+                console.error('Error en la detección de caras:', tomarFotosResponse.mensaje);
+            }
         } else {
-            console.error('Error al guardar las imágenes en el servidor.');
+            console.error('Error al guardar la imagen:', guardarImagenesResponse.mensaje);
         }
 
+        // Detener el flujo de la cámara y eliminar los elementos HTML
         stream.getTracks().forEach(track => track.stop());
         document.body.removeChild(video);
     } catch (error) {
@@ -325,18 +375,16 @@ async function tomarFotos(panelIndex) {
     }
 }
 
-// Función para convertir una data URL en un Blob
-function dataURItoBlob(dataURI) {
-    const byteString = atob(dataURI.split(',')[1]);
-    const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-    for (let i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
-    }
-    return new Blob([ab], { type: mimeString });
-}
-
+        // Esta función convierte un data URL a un blob
+        function dataURItoBlob(dataURI) {
+            const byteString = atob(dataURI.split(',')[1]);
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([ab], { type: 'image/jpeg' });
+        }
 
     </script>
 </body>
