@@ -273,15 +273,33 @@ async function tomarFotos(panelIndex) {
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             const dataURL = canvas.toDataURL('image/jpeg');
             fotos.push(dataURL);
-            await new Promise(resolve => setTimeout(resolve, 500)); // Espera 0.5 segundos entre cada foto
+
+            if (i < 2) {
+                // Esperar 0.5 segundos entre cada foto (excepto la última)
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
         }
 
-        // Enviar las fotos al servidor Django
+        // Detener el flujo de la cámara y eliminar los elementos HTML
+        stream.getTracks().forEach(track => track.stop());
+        document.body.removeChild(video);
+
+        // Comprobar si las imágenes se cargaron correctamente antes de guardarlas
         const formData = new FormData();
+        const imagenesValidas = [];
+
         fotos.forEach((dataURL, i) => {
             const blob = dataURItoBlob(dataURL);
-            formData.append(`imagen${i + 1}`, blob, `panel${panelIndex}_foto${i + 1}.jpg`);
+            if (blob) {
+                formData.append(`imagen${i + 1}`, blob, `panel${panelIndex}_foto${i + 1}.jpg`);
+                imagenesValidas.push(i);
+            }
         });
+
+        if (imagenesValidas.length === 0) {
+            console.error('No se cargaron imágenes válidas');
+            return;
+        }
 
         const panelNumero = panelIndex;
 
@@ -289,20 +307,39 @@ async function tomarFotos(panelIndex) {
         formData.append('panel_numero', panelNumero);
 
         // Enviar el formulario al servidor para guardar las imágenes
-        const guardarImagenesResponse = await fetch(`/guardar_imagenes/`, {
+        const guardarResponse = await fetch(`/guardar_imagenes/`, {
             method: 'POST',
             body: formData,
-        }).then(response => response.json())
-        .then(data => console.log(data));
+        });
 
-      
-        // Detener el flujo de la cámara y eliminar los elementos HTML
-        stream.getTracks().forEach(track => track.stop());
-        document.body.removeChild(video);
+        // Una vez que se han guardado las imágenes, llamar a la función para clasificar
+        await new Promise(resolve => setTimeout(resolve, 5000)); // 3000 milisegundos (3 segundos)
+
+
+        if (guardarResponse.ok) {
+            const clasificarResponse = await fetch(`/clasifica/`, {
+                method: 'POST',
+                body: formData,
+            }).then(response => response.json());
+            console.log(clasificarResponse);
+        } else {
+            console.error('Error al guardar imágenes');
+        }
     } catch (error) {
         console.error('Error al acceder a la cámara: ', error);
     }
 }
+
+
+async function clasificarImagen(panelIndex, fotos) {
+    // Simplemente utiliza el código que tenías para clasificar
+    // Reemplaza esta URL por la URL correcta para clasificar
+    return await fetch(`/clasifica/`, {
+        method: 'POST',
+        body: formData,
+    }).then(response => response.json());
+}
+
 
         // Esta función convierte un data URL a un blob
         function dataURItoBlob(dataURI) {

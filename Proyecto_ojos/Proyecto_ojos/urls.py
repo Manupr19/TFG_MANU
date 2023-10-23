@@ -6,14 +6,14 @@ from interfaz.views import inicio_view as inicio
 from entrenamiento.views import entrenador_views as entrenador
 from entrenamiento.views import guardar_imagenes as guardar
 from entrenamiento.views import tomar_fotos as tomar
-from entrenamiento.views import entrena as entrena
+from entrenamiento.views import clasificar as clasifica
 urlpatterns = [
     
     path('admin/', admin.site.urls),
     path('panel/', panel, name='panel_view'),
     path('login/', login, name='login_view'),
     path('tomarfotos/', tomar, name='tomarfotos'),
-    path('entrena/', entrena, name='entrena'),
+    path('clasifica/', clasifica, name='clasifica'),
     
     path('entrenamiento/', entrenador, name='entrenador_view'),
     path('', inicio, name='inicio_view'),

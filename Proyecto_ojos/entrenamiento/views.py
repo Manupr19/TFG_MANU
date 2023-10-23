@@ -13,13 +13,103 @@ from datetime import datetime
 
 
 # Directorio base para almacenar las imágenes
-directorio_base = '.' + os.sep + 'Entrena8' + os.sep
+
 
 # Inicializa un arreglo para rastrear el estado de los botones
 pulsado = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-# Create your views here.
-directorio_base = '.' + os.sep + 'Entrena6' + os.sep
+# Directorio donde se almacenarán las imágenes capturadas
+
+
+# Modelo de detección de caras
+detector = dlib.get_frontal_face_detector()
+predictor = dlib.shape_predictor('shape_68.dat')
+
+def shape_to_np(shape, dtype="int"):
+    coords = np.zeros((68, 2), dtype=dtype)
+    for i in range(0, 68):
+        coords[i] = (shape.part(i).x, shape.part(i).y)
+    return coords
+
+directorio_base = 'entrenamiento/'
+# Método de vista para clasificar ojos
+@csrf_exempt
+def clasificar(request):
+    global directorio_base
+
+    # Obtener el número de panel desde la solicitud
+    numero_seleccionado = request.POST['panel_numero']
+
+    # Directorio de imágenes capturadas desde el primer código
+    directorio_imagenes = f'entrenamiento/fotos/panel{numero_seleccionado}/'
+
+    # Directorio donde se guardarán los ojos normalizados
+    directorio_ojos = f'entrenamiento/fotos/fotosnormalizadas/panel{numero_seleccionado}/'
+
+    try:
+        # Verificar si el directorio de ojos normalizados existe, si no, créalo
+        if not os.path.exists(directorio_ojos):
+            os.makedirs(directorio_ojos)
+
+        # Listar archivos en el directorio de imágenes capturadas
+        archivos = os.listdir(directorio_imagenes)
+        for archivo in archivos:
+            if archivo.endswith('.jpg'):
+                img_path = os.path.join(directorio_imagenes, archivo)
+
+                # Leer la imagen desde el archivo
+                img = cv2.imread(img_path)
+
+                # Verificar si la imagen se cargó correctamente
+                if img is not None:
+                    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+                    # Detectar caras en la imagen
+                    rects = detector(gray)
+                    if len(rects) > 0:
+                        for rect in rects:
+                            # Obtener landmarks faciales
+                            shape = predictor(gray, rect)
+
+                            # Verificar que se detectaron caras
+                            if len(shape.parts()) >= 68:
+                                # Recortar y guardar los ojos izquierdo y derecho
+                             if img is not None:
+                                for i, (ojo_x, ojo_y) in enumerate([(36, 37), (42, 43)]):
+                                    x1, y1 = shape.part(ojo_x).x, shape.part(ojo_x).y
+                                    x2, y2 = shape.part(ojo_y).x, shape.part(ojo_y).y
+
+                                    # Verifica que las coordenadas sean válidas
+                                    if x1 >= 0 and y1 >= 0 and x2 >= 0 and y2 >= 0:
+                                        # Realiza el recorte
+                                        ojo_recortado = img[y1:y2, x1:x2]
+
+                                        # Verifica que el recorte no sea una matriz NumPy vacía (size > 0)
+                                        
+                                        ruta_ojo = f'{directorio_ojos}ojo{i}_panel{numero_seleccionado}_{datetime.today().strftime("%Y%m%d%H%M%S")}.jpg'
+                                        cv2.imwrite(ruta_ojo, ojo_recortado)
+                                      
+                                    else:
+                                        # Manejar el caso de coordenadas negativas
+                                        print(f"Coordenadas negativas para el ojo {i}")
+                             else:
+                                    # Manejar el caso en el que 'img' no es una imagen válida
+                                    print("La imagen no es válida")
+                            else:
+                                # Manejar el caso en el que no se detectaron caras en la imagen
+                                print("No se detectaron caras en la imagen")
+                    else:
+                        # Manejar el caso en el que no se detectaron caras en la imagen
+                        print("No se detectaron caras en la imagen")
+                else:
+                    # Manejar el caso en el que la imagen no se cargó correctamente
+                    print(f"No se pudo cargar la imagen: {img_path}")
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'message': 'Ojos clasificados y guardados correctamente'})
+
+
 def entrenador_views(request):
     return render(request, 'entrenador.html')
 
@@ -74,12 +164,7 @@ def guardar_imagenes(request):
 
 
 
-# Directorio donde se almacenarán las imágenes capturadas
-directorio_base = 'media/'
 
-# Modelo de detección de caras
-detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor('shape_68.dat')
 
 def shape_to_np(shape, dtype="int"):
     coords = np.zeros((68, 2), dtype=dtype)
