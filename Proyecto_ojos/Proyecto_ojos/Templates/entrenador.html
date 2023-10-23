@@ -123,13 +123,7 @@
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
             <button onclick="tomarFotos(1)">Tomar Fotos</button>
-            <div id="resultado-detector">
-                {% if caras_detectadas == 1 %}
-                    <i class="fas fa-check-circle" style="color: green;"></i> Caras detectadas correctamente
-                {% elif caras_detectadas == 0 %}
-                    <i class="fas fa-times-circle" style="color: red;"></i> Al menos una cara no se detectó en las imágenes
-                {% endif %}
-            </div>
+           
         </div>
 
         <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="2">
@@ -138,13 +132,7 @@
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
             <button onclick="tomarFotos(2)">Tomar Fotos</button>
-            <div id="resultado-detector">
-                {% if caras_detectadas == 1 %}
-                    <i class="fas fa-check-circle" style="color: green;"></i> Caras detectadas correctamente
-                {% elif caras_detectadas == 0 %}
-                    <i class="fas fa-times-circle" style="color: red;"></i> Al menos una cara no se detectó en las imágenes
-                {% endif %}
-            </div>
+       
         </div>
 
         <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="3">
@@ -153,13 +141,7 @@
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
             <button onclick="tomarFotos(3)">Tomar Fotos</button>
-            <div id="resultado-detector">
-                {% if caras_detectadas == 1 %}
-                    <i class="fas fa-check-circle" style="color: green;"></i> Caras detectadas correctamente
-                {% elif caras_detectadas == 0 %}
-                    <i class="fas fa-times-circle" style="color: red;"></i> Al menos una cara no se detectó en las imágenes
-                {% endif %}
-            </div>
+          
         </div>
     </div>
 
@@ -182,13 +164,7 @@
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
             <button onclick="tomarFotos(4)">Tomar Fotos</button>
-            <div id="resultado-detector">
-                {% if caras_detectadas == 1 %}
-                    <i class="fas fa-check-circle" style="color: green;"></i> Caras detectadas correctamente
-                {% elif caras_detectadas == 0 %}
-                    <i class="fas fa-times-circle" style="color: red;"></i> Al menos una cara no se detectó en las imágenes
-                {% endif %}
-            </div>
+         
         </div>
 
         <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="5">
@@ -197,13 +173,7 @@
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
             <button onclick="tomarFotos(5)">Tomar Fotos</button>
-            <div id="resultado-detector">
-                {% if caras_detectadas == 1 %}
-                    <i class="fas fa-check-circle" style="color: green;"></i> Caras detectadas correctamente
-                {% elif caras_detectadas == 0 %}
-                    <i class="fas fa-times-circle" style="color: red;"></i> Al menos una cara no se detectó en las imágenes
-                {% endif %}
-            </div>
+         
         </div>
 
         <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="6">
@@ -212,13 +182,7 @@
                 <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
             <button onclick="tomarFotos(6)">Tomar Fotos</button>
-            <div id="resultado-detector">
-                {% if caras_detectadas == 1 %}
-                    <i class="fas fa-check-circle" style="color: green;"></i> Caras detectadas correctamente
-                {% elif caras_detectadas == 0 %}
-                    <i class="fas fa-times-circle" style="color: red;"></i> Al menos una cara no se detectó en las imágenes
-                {% endif %}
-            </div>
+           
         </div>
     </div>
 
@@ -325,48 +289,13 @@ async function tomarFotos(panelIndex) {
         formData.append('panel_numero', panelNumero);
 
         // Enviar el formulario al servidor para guardar las imágenes
-        const guardarImagenesResponse = await fetch(`../guardar_imagenes/`, {
+        const guardarImagenesResponse = await fetch(`/guardar_imagenes/`, {
             method: 'POST',
             body: formData,
-        }).then(response => response.json());
+        }).then(response => response.json())
+        .then(data => console.log(data));
 
-        if (guardarImagenesResponse.success) {
-            // Una vez que se guardan las imágenes, ejecutar la detección de caras
-            const tomarFotosResponse = await fetch('/tomarfotos', {
-                method: 'POST',
-            }).then(response => response.json());
-
-            if (tomarFotosResponse.deteccion_exitosa) {
-                console.log('Se detectó una cara en todas las imágenes capturadas.');
-
-          // Agregar el número de panel al formulario
-            formData.append('panel_numero', panelNumero);
-
-            // Enviar el formulario al servidor para entrenamiento
-            const entrenamientoResponse = await fetch('/entrena', {
-                method: 'POST',
-                body: formData, // El formulario ahora incluye el número de panel
-            }).then(response => response.json());
-
-            if (entrenamientoResponse.entrenamiento_exitoso) {
-                console.log('Entrenamiento exitoso.');
-            } else {
-                console.error('Error en el entrenamiento:', entrenamientoResponse.mensaje);
-            }
-
-
-                if (entrenamientoResponse.entrenamiento_exitoso) {
-                    console.log('Entrenamiento exitoso.');
-                } else {
-                    console.error('Error en el entrenamiento:', entrenamientoResponse.mensaje);
-                }
-            } else {
-                console.error('Error en la detección de caras:', tomarFotosResponse.mensaje);
-            }
-        } else {
-            console.error('Error al guardar la imagen:', guardarImagenesResponse.mensaje);
-        }
-
+      
         // Detener el flujo de la cámara y eliminar los elementos HTML
         stream.getTracks().forEach(track => track.stop());
         document.body.removeChild(video);
