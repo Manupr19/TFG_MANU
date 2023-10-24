@@ -8,7 +8,9 @@ import numpy as np
 from django.shortcuts import render
 from django.http import JsonResponse
 import time
+import tkinter as tk
 import cv2
+from PIL import Image, ImageTk
 from datetime import datetime
 
 
@@ -66,7 +68,7 @@ def clasificar(request):
 
                     # Detectar caras en la imagen
                     rects = detector(gray)
-                    if len(rects) > 0:
+                    if len(rects) != 0:
                         for rect in rects:
                             # Obtener landmarks faciales
                             shape = predictor(gray, rect)
@@ -74,7 +76,6 @@ def clasificar(request):
                             # Verificar que se detectaron caras
                             if len(shape.parts()) >= 68:
                                 # Recortar y guardar los ojos izquierdo y derecho
-                             if img is not None:
                                 for i, (ojo_x, ojo_y) in enumerate([(36, 37), (42, 43)]):
                                     x1, y1 = shape.part(ojo_x).x, shape.part(ojo_x).y
                                     x2, y2 = shape.part(ojo_y).x, shape.part(ojo_y).y
@@ -85,16 +86,14 @@ def clasificar(request):
                                         ojo_recortado = img[y1:y2, x1:x2]
 
                                         # Verifica que el recorte no sea una matriz NumPy vacía (size > 0)
-                                        
-                                        ruta_ojo = f'{directorio_ojos}ojo{i}_panel{numero_seleccionado}_{datetime.today().strftime("%Y%m%d%H%M%S")}.jpg'
-                                        cv2.imwrite(ruta_ojo, ojo_recortado)
-                                      
+                                        if ojo_recortado.size > 0 and ojo_recortado.shape[0] > 1 and ojo_recortado.shape[1] > 1:
+                                            ruta_ojo = f'{directorio_ojos}ojo{i}_panel{numero_seleccionado}_{datetime.today().strftime("%Y%m%d%H%M%S")}.jpg'
+                                            cv2.imwrite(ruta_ojo, ojo_recortado)
+                                        else:
+                                            print(f"Recorte vacío para el ojo {i}")
                                     else:
                                         # Manejar el caso de coordenadas negativas
                                         print(f"Coordenadas negativas para el ojo {i}")
-                             else:
-                                    # Manejar el caso en el que 'img' no es una imagen válida
-                                    print("La imagen no es válida")
                             else:
                                 # Manejar el caso en el que no se detectaron caras en la imagen
                                 print("No se detectaron caras en la imagen")
@@ -108,6 +107,104 @@ def clasificar(request):
         return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'message': 'Ojos clasificados y guardados correctamente'})
+
+
+def arrayTOimgtk(lectura):
+    b, g, r = cv2.split(lectura)
+    img = cv2.merge((r, g, b))
+    im = Image.fromarray(img)
+    imgtk = ImageTk.PhotoImage(image=im)
+    return imgtk
+
+root = tk.Tk()
+
+ALTO = root.winfo_screenheight() - 50
+ANCHO = root.winfo_screenwidth()
+ANCHO = 1900  # Lo pongo a mano por mis dos monitores
+root.config(width=ANCHO, height=ALTO)
+continua = 1
+root.title("Interfaz de Entrenamiento")
+# Creamos los marcos de ojos
+marconegroa = np.zeros((40, 70, 3), dtype=np.uint8)
+marconegrotk = arrayTOimgtk(marconegroa)
+
+marcos_ojos = []
+for i in range(9):
+    marcos_ojos.append([tk.Label(root, image=marconegrotk), tk.Label(root, image=marconegrotk)])
+
+
+import os
+import cv2
+import dlib
+import numpy as np
+import tkinter as tk
+from datetime import datetime
+
+import os
+import cv2
+import dlib
+import numpy as np
+import tkinter as tk
+from datetime import datetime
+
+@csrf_exempt
+def clasificaPedro(request):
+    global izquierda_sup
+    global derecha_sup
+    global derecha_inf
+    global izquierda_inf
+    global centro
+
+    numero_seleccionado = request.POST['panel_numero']
+
+    # Directorio de imágenes capturadas desde el primer código
+    directorio_imagenes = f'entrenamiento/fotos/panel{numero_seleccionado}/'
+
+    # Directorio donde se guardarán los ojos normalizados
+    directorio_ojos = f'entrenamiento/fotos/fotosnormalizadas/panel{numero_seleccionado}/'
+
+    detector = dlib.get_frontal_face_detector()
+    predictor = dlib.shape_predictor('shape_68.dat')
+
+    archivos = os.listdir(directorio_imagenes)
+
+    for archivo in archivos:
+        if archivo.endswith('.jpg'):
+            # Leer la imagen desde el archivo
+            img_path = os.path.join(directorio_imagenes, archivo)
+            ima = cv2.imread(img_path)
+            img = ima
+            imgtk = arrayTOimgtk(cv2.resize(img, (int(img.shape[1] / 2), int(img.shape[0] / 2))))
+            marco_camara = tk.Label(root, image=imgtk)
+            marco_camara.place(x=ANCHO / 2 - int(np.shape(img)[1] * 0.6) / 2, y=140)
+
+        try:
+            while continua == 1:
+                img = ima
+                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                rects = detector(gray, 1)
+                if len(rects) == 0:
+                    # No HAY CARAS
+                    cv2.circle(img, (11, 11), 10, (0, 0, 255), -1)
+                    root.configure(bg='grey')
+                else:
+                    cv2.circle(img, (11, 11), 10, (0, 255, 0), -1)
+                    root.configure(bg='lightgrey')
+                    for rect in rects:
+                        shape = predictor(gray, rect)
+                        shape = shape_to_np(shape)
+                        # Resto del código...
+
+                    imgtk = arrayTOimgtk(cv2.resize(img, (int(img.shape[1] * 0.6), int(img.shape[0] * 0.6))))
+                    marco_camara.config(image=imgtk)
+                    print("Fin del hilo")
+                    ima.release()
+
+        except Exception as e:
+            ima.release()
+    return JsonResponse({'error': str(e)}, status=500)
+
+
 
 
 def entrenador_views(request):
