@@ -68,7 +68,7 @@ def clasificar(request):
 
                     # Detectar caras en la imagen
                     rects = detector(gray)
-                    if len(rects) != 0:
+                    if len(rects) > 0:
                         for rect in rects:
                             # Obtener landmarks faciales
                             shape = predictor(gray, rect)
@@ -108,6 +108,91 @@ def clasificar(request):
 
     return JsonResponse({'message': 'Ojos clasificados y guardados correctamente'})
 
+@csrf_exempt
+def entrena():
+    global izquierda_sup
+    global derecha_sup
+    global derecha_inf
+    global izquierda_inf
+    global centro
+
+    detector = dlib.get_frontal_face_detector()
+    predictor = dlib.shape_predictor('shape_68.dat')
+
+    # left = [36, 37, 38, 39, 40, 41]
+    # right = [42, 43, 44, 45, 46, 47]
+
+    cap = cv2.VideoCapture(0)
+    ret, img = cap.read()
+    imgtk = arrayTOimgtk(cv2.resize(img, (int(img.shape[1] / 2), int(img.shape[0] / 2))))
+    marco_camara = tk.Label(root, image=imgtk)
+    marco_camara.place(x=ANCHO / 2 - int(np.shape(img)[1] * 0.6) / 2, y=140)
+
+    try:
+        while continua == 1:
+            ret, img = cap.read()
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            rects = detector(gray, 1)
+            if len(rects) == 0:
+                # No HAY CARAS
+                cv2.circle(img, (11, 11), 10, (0, 0, 255), -1)
+                root.configure(bg='grey')
+            else:
+                cv2.circle(img, (11, 11), 10, (0, 255, 0), -1)
+                root.configure(bg='lightgrey')
+                for rect in rects:
+                    shape = predictor(gray, rect)
+                    shape = shape_to_np(shape)
+                    # Estraigo coordenadas ojo izquierdo
+                    xmin = shape[37][0]
+                    xmax = shape[40][0]
+                    ymax = max(shape[38][1], shape[39][1], shape[41][1], shape[42][1])
+                    ymin = min(shape[38][1], shape[39][1], shape[41][1], shape[42][1])
+
+                    # Creamos imagenes del ojo izquierdo
+                    ojoizq = img[ymin - 10:ymax + 10, xmin - 20:xmax + 20]
+                    ojoizq = cv2.resize(ojoizq, (70, 40), interpolation=cv2.INTER_AREA)
+
+                    # Estraigo coordenadas ojo derecho
+                    xmin = shape[42][0]
+                    xmax = shape[45][0]
+                    ymax = max(shape[43][1], shape[44][1], shape[46][1], shape[47][1])
+                    ymin = min(shape[43][1], shape[44][1], shape[46][1], shape[47][1])
+
+                    # Creamos imagenes del ojo derecho
+                    ojoder = img[ymin - 10:ymax + 10, xmin - 20:xmax + 20]
+                    ojoder = cv2.resize(ojoder, (70, 40), interpolation=cv2.INTER_AREA)
+
+                    # Normalizamos imagen
+                    norm_img = np.zeros((70, 40))
+                    ojoizqnorm = cv2.normalize(ojoizq, norm_img, 0, 255, cv2.NORM_MINMAX)
+                    ojodernorm = cv2.normalize(ojoder, norm_img, 0, 255, cv2.NORM_MINMAX)
+
+                    # Visualizamos los ojos
+                    ojoizqnormtk = arrayTOimgtk(ojoizqnorm)
+                    ojodernormtk = arrayTOimgtk(ojodernorm)
+                    for k in range(9):
+                        marcos_ojos[k][0].config(image=ojoizqnormtk)
+                        marcos_ojos[k][1].config(image=ojodernormtk)
+
+                    # Guardamos la seleccion
+                    for k in range(9):
+                        if pulsado[k] == 1:
+                            cv2.imwrite(
+                                directorio_base + 'ojoder' + os.sep + 'ojoder' + str(k) + os.sep + 'ojoder' + str(k)
+                                + '_' + datetime.today().strftime('%Y%m%d%H%M%S') + '.jpg', ojodernorm)
+                            cv2.imwrite(
+                                directorio_base + 'ojoizq' + os.sep + 'ojoizq' + str(k) + os.sep + 'ojoizq' + str(k)
+                                + '_' + datetime.today().strftime('%Y%m%d%H%M%S') + '.jpg', ojoizqnorm)
+                            pulsado[k] = 0
+
+            imgtk = arrayTOimgtk(cv2.resize(img, (int(img.shape[1] * 0.6), int(img.shape[0] * 0.6))))
+            marco_camara.config(image=imgtk)
+        print("Fin del hilo")
+        cap.release()
+    except Exception as e:
+        print("saliendo del hilo por " + str(e))
+        cap.release()
 
 def arrayTOimgtk(lectura):
     b, g, r = cv2.split(lectura)
