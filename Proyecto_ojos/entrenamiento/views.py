@@ -72,19 +72,22 @@ def clasificar(request):
                         for rect in rects:
                             # Obtener landmarks faciales
                             shape = predictor(gray, rect)
-
+    # left = [36, 37, 38, 39, 40, 41]
+    # right = [42, 43, 44, 45, 46, 47]
                             # Verificar que se detectaron caras
                             if len(shape.parts()) >= 68:
                                 # Recortar y guardar los ojos izquierdo y derecho
-                                for i, (ojo_x, ojo_y) in enumerate([(36, 37), (42, 43)]):
+                                for i, (ojo_x, ojo_y) in enumerate([(36,41), (42, 47)]):
                                     x1, y1 = shape.part(ojo_x).x, shape.part(ojo_x).y
                                     x2, y2 = shape.part(ojo_y).x, shape.part(ojo_y).y
 
                                     # Verifica que las coordenadas sean válidas
                                     if x1 >= 0 and y1 >= 0 and x2 >= 0 and y2 >= 0:
                                         # Realiza el recorte
-                                        ojo_recortado = img[y1:y2, x1:x2]
-
+                                        print(f"x1: {x1}, y1: {y1}, x2: {x2}, y2: {y2}")                               
+                                        ojo_recortado = img[y1:y2, x1:x2] #esta creando arrays vacios por eso ojo recortado esta vacio 
+                                        print(f"Dimensiones de ojo_recortado {i}: {ojo_recortado.shape}")
+                                        print(ojo_recortado)
                                         # Verifica que el recorte no sea una matriz NumPy vacía (size > 0)
                                         if ojo_recortado.size > 0 and ojo_recortado.shape[0] > 1 and ojo_recortado.shape[1] > 1:
                                             ruta_ojo = f'{directorio_ojos}ojo{i}_panel{numero_seleccionado}_{datetime.today().strftime("%Y%m%d%H%M%S")}.jpg'
