@@ -6,36 +6,18 @@ from django.views.decorators.csrf import csrf_exempt
 import dlib
 import numpy as np
 from django.shortcuts import render
-from django.http import JsonResponse
 import time
 import tkinter as tk
 import cv2
 from PIL import Image, ImageTk
 from datetime import datetime
 
-
-# Directorio base para almacenar las imágenes
-
-
 # Inicializa un arreglo para rastrear el estado de los botones
 pulsado = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-
-# Directorio donde se almacenarán las imágenes capturadas
-
-
 # Modelo de detección de caras
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor('shape_68.dat')
-
-def shape_to_np(shape, dtype="int"):
-    coords = np.zeros((68, 2), dtype=dtype)
-    for i in range(0, 68):
-        coords[i] = (shape.part(i).x, shape.part(i).y)
-    return coords
-import os
-import cv2
-from django.http import JsonResponse
-from datetime import datetime
+vecinos=3
 
 # Método de vista para clasificar ojos
 @csrf_exempt
@@ -110,90 +92,6 @@ def clasificar(request):
 
     return JsonResponse({'message': 'Ojos clasificados y guardados correctamente'})
 
-def entrena():
-    global izquierda_sup
-    global derecha_sup
-    global derecha_inf
-    global izquierda_inf
-    global centro
-
-    detector = dlib.get_frontal_face_detector()
-    predictor = dlib.shape_predictor('shape_68.dat')
-
-    # left = [36, 37, 38, 39, 40, 41]
-    # right = [42, 43, 44, 45, 46, 47]
-
-    cap = cv2.VideoCapture(0)
-    ret, img = cap.read()
-    imgtk = arrayTOimgtk(cv2.resize(img, (int(img.shape[1] / 2), int(img.shape[0] / 2))))
-    marco_camara = tk.Label(root, image=imgtk)
-    marco_camara.place(x=ANCHO / 2 - int(np.shape(img)[1] * 0.6) / 2, y=140)
-
-    try:
-        while continua == 1:
-            ret, img = cap.read()
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            rects = detector(gray, 1)
-            if len(rects) == 0:
-                # No HAY CARAS
-                cv2.circle(img, (11, 11), 10, (0, 0, 255), -1)
-                root.configure(bg='grey')
-            else:
-                cv2.circle(img, (11, 11), 10, (0, 255, 0), -1)
-                root.configure(bg='lightgrey')
-                for rect in rects:
-                    shape = predictor(gray, rect)
-                    shape = shape_to_np(shape)
-                    # Estraigo coordenadas ojo izquierdo
-                    xmin = shape[37][0]
-                    xmax = shape[40][0]
-                    ymax = max(shape[38][1], shape[39][1], shape[41][1], shape[42][1])
-                    ymin = min(shape[38][1], shape[39][1], shape[41][1], shape[42][1])
-
-                    # Creamos imagenes del ojo izquierdo
-                    ojoizq = img[ymin - 10:ymax + 10, xmin - 20:xmax + 20]
-                    ojoizq = cv2.resize(ojoizq, (70, 40), interpolation=cv2.INTER_AREA)
-
-                    # Estraigo coordenadas ojo derecho
-                    xmin = shape[42][0]
-                    xmax = shape[45][0]
-                    ymax = max(shape[43][1], shape[44][1], shape[46][1], shape[47][1])
-                    ymin = min(shape[43][1], shape[44][1], shape[46][1], shape[47][1])
-
-                    # Creamos imagenes del ojo derecho
-                    ojoder = img[ymin - 10:ymax + 10, xmin - 20:xmax + 20]
-                    ojoder = cv2.resize(ojoder, (70, 40), interpolation=cv2.INTER_AREA)
-
-                    # Normalizamos imagen
-                    norm_img = np.zeros((70, 40))
-                    ojoizqnorm = cv2.normalize(ojoizq, norm_img, 0, 255, cv2.NORM_MINMAX)
-                    ojodernorm = cv2.normalize(ojoder, norm_img, 0, 255, cv2.NORM_MINMAX)
-
-                    # Visualizamos los ojos
-                    ojoizqnormtk = arrayTOimgtk(ojoizqnorm)
-                    ojodernormtk = arrayTOimgtk(ojodernorm)
-                    for k in range(9):
-                        marcos_ojos[k][0].config(image=ojoizqnormtk)
-                        marcos_ojos[k][1].config(image=ojodernormtk)
-
-                    # Guardamos la seleccion
-                    for k in range(9):
-                        if pulsado[k] == 1:
-                            cv2.imwrite(
-                                directorio_base + 'ojoder' + os.sep + 'ojoder' + str(k) + os.sep + 'ojoder' + str(k)
-                                + '_' + datetime.today().strftime('%Y%m%d%H%M%S') + '.jpg', ojodernorm)
-                            cv2.imwrite(
-                                directorio_base + 'ojoizq' + os.sep + 'ojoizq' + str(k) + os.sep + 'ojoizq' + str(k)
-                                + '_' + datetime.today().strftime('%Y%m%d%H%M%S') + '.jpg', ojoizqnorm)
-                            pulsado[k] = 0
-
-            imgtk = arrayTOimgtk(cv2.resize(img, (int(img.shape[1] * 0.6), int(img.shape[0] * 0.6))))
-            marco_camara.config(image=imgtk)
-        print("Fin del hilo")
-        cap.release()
-    except Exception as e:
-        print("saliendo del hilo por " + str(e))
-        cap.release()
 
 def arrayTOimgtk(lectura):
     b, g, r = cv2.split(lectura)
@@ -217,80 +115,6 @@ marconegrotk = arrayTOimgtk(marconegroa)
 marcos_ojos = []
 for i in range(9):
     marcos_ojos.append([tk.Label(root, image=marconegrotk), tk.Label(root, image=marconegrotk)])
-
-
-import os
-import cv2
-import dlib
-import numpy as np
-import tkinter as tk
-from datetime import datetime
-
-import os
-import cv2
-import dlib
-import numpy as np
-import tkinter as tk
-from datetime import datetime
-
-@csrf_exempt
-def clasificaPedro(request):
-    global izquierda_sup
-    global derecha_sup
-    global derecha_inf
-    global izquierda_inf
-    global centro
-
-    numero_seleccionado = request.POST['panel_numero']
-
-    # Directorio de imágenes capturadas desde el primer código
-    directorio_imagenes = f'entrenamiento/fotos/panel{numero_seleccionado}/'
-
-    # Directorio donde se guardarán los ojos normalizados
-    directorio_ojos = f'entrenamiento/fotos/fotosnormalizadas/panel{numero_seleccionado}/'
-
-    detector = dlib.get_frontal_face_detector()
-    predictor = dlib.shape_predictor('shape_68.dat')
-
-    archivos = os.listdir(directorio_imagenes)
-
-    for archivo in archivos:
-        if archivo.endswith('.jpg'):
-            # Leer la imagen desde el archivo
-            img_path = os.path.join(directorio_imagenes, archivo)
-            ima = cv2.imread(img_path)
-            img = ima
-            imgtk = arrayTOimgtk(cv2.resize(img, (int(img.shape[1] / 2), int(img.shape[0] / 2))))
-            marco_camara = tk.Label(root, image=imgtk)
-            marco_camara.place(x=ANCHO / 2 - int(np.shape(img)[1] * 0.6) / 2, y=140)
-
-        try:
-            while continua == 1:
-                img = ima
-                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-                rects = detector(gray, 1)
-                if len(rects) == 0:
-                    # No HAY CARAS
-                    cv2.circle(img, (11, 11), 10, (0, 0, 255), -1)
-                    root.configure(bg='grey')
-                else:
-                    cv2.circle(img, (11, 11), 10, (0, 255, 0), -1)
-                    root.configure(bg='lightgrey')
-                    for rect in rects:
-                        shape = predictor(gray, rect)
-                        shape = shape_to_np(shape)
-                        # Resto del código...
-
-                    imgtk = arrayTOimgtk(cv2.resize(img, (int(img.shape[1] * 0.6), int(img.shape[0] * 0.6))))
-                    marco_camara.config(image=imgtk)
-                    print("Fin del hilo")
-                    ima.release()
-
-        except Exception as e:
-            ima.release()
-    return JsonResponse({'error': str(e)}, status=500)
-
-
 
 
 def entrenador_views(request):
@@ -360,83 +184,53 @@ def ajustar_gamma(imagen, gamma=1.0):
     table = np.array([((i / 255.0) ** invGamma) * 255 for i in np.arange(0, 256)]).astype("uint8")
     return cv2.LUT(imagen, table)
 
-def entrena(request):
-    global directorio_base
+def entrenar_knn_para_todos_los_ojos(directorio_base, ojo, vecinos):
+    # Lista de etiquetas para las clases de ojos (por ejemplo, 'ojoizq0' hasta 'ojoizq2')
+    clases = [f'{ojo}{i}' for i in range(3)]  # Tres imágenes por ojo
 
-    # Obtener el número de panel desde la solicitud
-    numero_seleccionado = request.POST['panel_numero']
+    etiqueta = 0
 
-    # Directorio de imágenes
-    directorio_imagenes = f'{directorio_base}fotos/panel{numero_seleccionado}/'
+    training_data = []  # Almacenará los datos de entrenamiento (imágenes ecualizadas)
+    training_labels = []  # Almacenará las etiquetas correspondientes
 
-    # Inicializar el detector de caras de Dlib
-    detector = dlib.get_frontal_face_detector()
-    predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
+    for clase in clases:
+        # Ruta al directorio que contiene las imágenes de una clase específica
+        input_images_path = os.path.join(directorio_base, ojo, clase)
+        files_names = os.listdir(input_images_path)
 
-    # Lista para almacenar las imágenes procesadas
-    imagenes_capturadas = []
+        for fichero in files_names:
+            # Ruta de la imagen actual
+            fichpath = os.path.join(input_images_path, fichero)
+            print(fichpath)
 
-    try:
-        # Listar archivos en el directorio de imágenes
-        archivos = os.listdir(directorio_imagenes)
-        for archivo in archivos:
-            if archivo.endswith('.jpg'):
-                img_path = os.path.join(directorio_imagenes, archivo)
+            # Leer la imagen
+            img = cv2.imread(fichpath)
 
-                # Leer la imagen desde el archivo
-                img = cv2.imread(img_path)
-                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            # Ecualizar el histograma de la imagen en escala de grises
+            img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            img_eq = cv2.equalizeHist(img_gray)
 
-                # Detectar caras en la imagen
-                rects = detector(gray)
-                if len(rects) > 0:
-                    for rect in rects:
-                        # Obtener landmarks faciales
-                        shape = predictor(gray, rect)
+            # Redimensionar la imagen a un arreglo 1D
+            img_eq_1d = np.reshape(img_eq, (1, -1))
 
-                        # Procesa la imagen o extrae información de interés
-                        # Aquí puedes realizar tareas como recortar las caras, extraer características, etc.
+            # Agregar la imagen ecualizada y su etiqueta al conjunto de datos de entrenamiento
+            training_data.append(img_eq_1d)
+            training_labels.append(etiqueta)
 
-                        # Por ejemplo, recortar y guardar la cara detectada
-                        x, y, w, h = rect.left(), rect.top(), rect.width(), rect.height()
-                        cara_recortada = img[y:y+h, x:x+w]
-                        ruta_cara_recortada = f'{directorio_base}caras/panel{numero_seleccionado}/cara_{datetime.today().strftime("%Y%m%d%H%M%S")}.jpg'
-                        cv2.imwrite(ruta_cara_recortada, cara_recortada)
+        etiqueta += 1
 
-                        # Agregar la ruta de la cara recortada a la lista de imágenes procesadas
-                        imagenes_capturadas.append(ruta_cara_recortada)
+    # Convertir los datos y etiquetas en arreglos NumPy
+    training_data = np.array(training_data, dtype=np.float32)
+    training_labels = np.array(training_labels, dtype=np.float32)
+
+    print(training_data.shape)
     
-    except Exception as e:
-        print("Error:", str(e))
-    
-    return JsonResponse({'imagenes_capturadas': imagenes_capturadas})
+    # Crear el clasificador KNN
+    knn = cv2.ml.KNearest_create()
 
-@csrf_exempt
-def tomar_fotos(request):
-    if request.method == 'POST':
-        try:
-            # Simula la captura de imágenes desde la cámara
-            # Agrega aquí tu lógica de captura de imágenes y detección de caras
-            # Ejemplo: Creación de una lista de rutas de imágenes simuladas
-            imagenes_capturadas = []
-            for i in range(3):
-                etiqueta = f'panel{request.POST["panel_numero"]}'
-                img_path = f'{directorio_base}fotos/{etiqueta}/{etiqueta}_{i}_{datetime.today().strftime("%Y%m%d%H%M%S")}.jpg'
-                imagenes_capturadas.append(img_path)
-            
-            # Simula la detección de caras
-            deteccion_exitosa = True  # Cambia esto según el resultado de la detección
+    # Entrenar el clasificador KNN con los datos de entrenamiento
+    knn.train(training_data, cv2.ml.ROW_SAMPLE, training_labels)
 
-            if deteccion_exitosa:
-                mensaje = 'Se detectó una cara en todas las imágenes capturadas.'
-            else:
-                mensaje = 'Error en la detección de caras.'
+    return knn
 
-            resultado = {'deteccion_exitosa': deteccion_exitosa, 'mensaje': mensaje}
 
-        except Exception as e:
-            resultado = {'deteccion_exitosa': False, 'mensaje': str(e)}
-
-        return JsonResponse(resultado)
-def entrenador(request):
-    return render(request, 'entrenador.html')
