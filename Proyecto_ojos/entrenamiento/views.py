@@ -79,11 +79,11 @@ def clasificar(request):
                             # Verificar que se detectaron caras
                             if len(shape.parts()) >= 68:
                                 # Recortar y guardar los ojos izquierdo y derecho
-                                x1_left, y1_left = shape.part(36).x, shape.part(36).y
-                                x2_left, y2_left = shape.part(41).x, shape.part(41).y
-                                x1_right, y1_right = shape.part(42).x, shape.part(42).y
-                                x2_right, y2_right = shape.part(47).x, shape.part(47).y
-
+                         # Ajusto los puntos de inicio y fin para una región mucho más grande
+                                x1_left, y1_left = shape.part(36).x - 20, shape.part(37).y - 20
+                                x2_left, y2_left = shape.part(39).x + 20, shape.part(41).y + 20
+                                x1_right, y1_right = shape.part(42).x - 20, shape.part(43).y - 20
+                                x2_right, y2_right = shape.part(45).x + 20, shape.part(47).y + 20
                                 # Verifica que las coordenadas sean válidas
                                 if x1_left >= 0 and y1_left >= 0 and x2_left >= 0 and y2_left >= 0:
                                     # Realiza el recorte y guarda el ojo izquierdo
