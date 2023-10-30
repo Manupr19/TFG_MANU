@@ -72,31 +72,52 @@ def clasificar(request):
                         for rect in rects:
                             # Obtener landmarks faciales
                             shape = predictor(gray, rect)
-    # left = [36, 37, 38, 39, 40, 41]
-    # right = [42, 43, 44, 45, 46, 47]
+                            # left = [36, 37, 38, 39, 40, 41] x
+                            # right = [42, 43, 44, 45, 46, 47] y
                             # Verificar que se detectaron caras
                             if len(shape.parts()) >= 68:
                                 # Recortar y guardar los ojos izquierdo y derecho
-                                for i, (ojo_x, ojo_y) in enumerate([(36,41), (42, 47)]):
-                                    x1, y1 = shape.part(ojo_x).x, shape.part(ojo_x).y
-                                    x2, y2 = shape.part(ojo_y).x, shape.part(ojo_y).y
+                                for i, (left_start, left_end, right_start, right_end) in enumerate([(36, 41, 42, 47)]):
+                                        x1_left, y1_left = shape.part(left_start).x, shape.part(left_start).y
+                                        x2_left, y2_left = shape.part(left_end).x, shape.part(left_end).y
 
-                                    # Verifica que las coordenadas sean válidas
-                                    if x1 >= 0 and y1 >= 0 and x2 >= 0 and y2 >= 0:
-                                        # Realiza el recorte
-                                        print(f"x1: {x1}, y1: {y1}, x2: {x2}, y2: {y2}")                               
-                                        ojo_recortado = img[y1:y2, x1:x2] #esta creando arrays vacios por eso ojo recortado esta vacio 
-                                        print(f"Dimensiones de ojo_recortado {i}: {ojo_recortado.shape}")
-                                        print(ojo_recortado)
-                                        # Verifica que el recorte no sea una matriz NumPy vacía (size > 0)
-                                        if ojo_recortado.size > 0 and ojo_recortado.shape[0] > 1 and ojo_recortado.shape[1] > 1:
-                                            ruta_ojo = f'{directorio_ojos}ojo{i}_panel{numero_seleccionado}_{datetime.today().strftime("%Y%m%d%H%M%S")}.jpg'
-                                            cv2.imwrite(ruta_ojo, ojo_recortado)
+                                        x1_right, y1_right = shape.part(right_start).x, shape.part(right_start).y
+                                        x2_right, y2_right = shape.part(right_end).x, shape.part(right_end).y
+
+                                        # Usar x1_left, y1_left, x2_left, y2_left para el ojo izquierdo
+                                        # Usar x1_right, y1_right, x2_right, y2_right para el ojo derecho
+
+
+                                        # Verifica que las coordenadas sean válidas
+                                        if x1_left >= 0 and y1_left >= 0 and x2_left >= 0 and y2_left >= 0:
+                                            # Realiza el recorte
+                                           # print(f"x1: {x1_left}, y1: {y1_left}, x2: {x2_left}, y2: {y2_left}")                               
+                                            ojo_recortado = img[y1_left:y2_left, x1_left:x2_left] #esta creando arrays vacios por eso ojo recortado esta vacio 
+                                            #print(f"Dimensiones de ojo_recortado {i}: {ojo_recortado.shape}")
+                                            #print(ojo_recortado)
+                                            # Verifica que el recorte no sea una matriz NumPy vacía (size > 0)
+                                            if ojo_recortado.size > 0 and ojo_recortado.shape[0] > 1 and ojo_recortado.shape[1] > 1:
+                                                ruta_ojo = f'{directorio_ojos}ojoizq{i}_panel{numero_seleccionado}_{datetime.today().strftime("%Y%m%d%H%M%S")}.jpg'
+                                                cv2.imwrite(ruta_ojo, ojo_recortado)
+                                            else:
+                                                print(f"Recorte vacío para el ojo izquierdo")
+
+                                                        # Verifica que las coordenadas sean válidas
+                                        if x1_right >= 0 and y1_right >= 0 and x2_right >= 0 and y2_right >= 0:
+                                            # Realiza el recorte
+                                            print(f"x1: {x1_right}, y1: {y1_right}, x2: {x2_right}, y2: {y2_right}")                               
+                                            ojo_recortado = img[y1_right:y2_right, x1_right:x2_right] #esta creando arrays vacios por eso ojo recortado esta vacio 
+                                            print(f"Dimensiones de ojo_recortado {i}: {ojo_recortado.shape}")
+                                            print(ojo_recortado)
+                                            # Verifica que el recorte no sea una matriz NumPy vacía (size > 0)
+                                            if ojo_recortado.size > 0 and ojo_recortado.shape[0] > 1 and ojo_recortado.shape[1] > 1:
+                                                ruta_ojo = f'{directorio_ojos}ojoder{i}_panel{numero_seleccionado}_{datetime.today().strftime("%Y%m%d%H%M%S")}.jpg'
+                                                cv2.imwrite(ruta_ojo, ojo_recortado)
+                                            else:
+                                                print(f"Recorte vacío para el ojo derecho")
                                         else:
-                                            print(f"Recorte vacío para el ojo {i}")
-                                    else:
-                                        # Manejar el caso de coordenadas negativas
-                                        print(f"Coordenadas negativas para el ojo {i}")
+                                         # Manejar el caso de coordenadas negativas
+                                         print(f"Coordenadas negativas para el ojo {i}")
                             else:
                                 # Manejar el caso en el que no se detectaron caras en la imagen
                                 print("No se detectaron caras en la imagen")
