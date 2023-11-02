@@ -11,6 +11,7 @@ import tkinter as tk
 import cv2
 from PIL import Image, ImageTk
 from datetime import datetime
+import json
 
 # Inicializa un arreglo para rastrear el estado de los botones
 pulsado = [0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -18,6 +19,7 @@ pulsado = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor('shape_68.dat')
 vecinos=3
+direc_base='/entrenamientoS'
 
 # Método de vista para clasificar ojos
 @csrf_exempt
@@ -184,53 +186,68 @@ def ajustar_gamma(imagen, gamma=1.0):
     table = np.array([((i / 255.0) ** invGamma) * 255 for i in np.arange(0, 256)]).astype("uint8")
     return cv2.LUT(imagen, table)
 
-def entrenar_knn_para_todos_los_ojos(directorio_base, ojo, vecinos):
-    # Lista de etiquetas para las clases de ojos (por ejemplo, 'ojoizq0' hasta 'ojoizq2')
-    clases = [f'{ojo}{i}' for i in range(3)]  # Tres imágenes por ojo
 
+# Ruta base donde se encuentran las imágenes de entrenamiento normalizadas
+directorio_base = '/entrenamiento/fotos/fotosnormalizadas/'
+
+@csrf_exempt
+def entrenar_knn_para_todos_los_ojos(request):
+    if request.method == 'POST':
+        try:
+            # Obtener datos del formulario POST
+            panel_numero = request.POST['panel_numero']
+            ojo = request.POST['ojo']
+            vecinos = int(request.POST['vecinos'])
+
+            # Ruta al directorio de imágenes para entrenamiento
+            directorio_entrenamiento = os.path.join(directorio_base, f'panel{panel_numero}', ojo)
+
+            # Llamar a la función entrenaoKNN con los parámetros proporcionados
+            knn = entrenaoKNN(vecinos, ojo, directorio_entrenamiento)
+
+            return JsonResponse({'status': 'Entrenamiento completado'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'status': 'Error en la solicitud'}, status=400)
+
+def entrenaoKNN(vecinos, ojo, directorio_base):
+    clases = [ojo + str(i) for i in range(9)]
     etiqueta = 0
-
-    training_data = []  # Almacenará los datos de entrenamiento (imágenes ecualizadas)
-    training_labels = []  # Almacenará las etiquetas correspondientes
+    trainingdata = None
+    trainingLabels = None
 
     for clase in clases:
-        # Ruta al directorio que contiene las imágenes de una clase específica
-        input_images_path = os.path.join(directorio_base, ojo, clase)
+        input_images_path = os.path.join(directorio_base, clase)
         files_names = os.listdir(input_images_path)
 
         for fichero in files_names:
-            # Ruta de la imagen actual
             fichpath = os.path.join(input_images_path, fichero)
-            print(fichpath)
-
-            # Leer la imagen
             img = cv2.imread(fichpath)
 
-            # Ecualizar el histograma de la imagen en escala de grises
-            img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            img_eq = cv2.equalizeHist(img_gray)
+            imggray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            imgecu = cv2.equalizeHist(imggray)
+            imgecu1d = np.reshape(imgecu, (1, 2800))
 
-            # Redimensionar la imagen a un arreglo 1D
-            img_eq_1d = np.reshape(img_eq, (1, -1))
-
-            # Agregar la imagen ecualizada y su etiqueta al conjunto de datos de entrenamiento
-            training_data.append(img_eq_1d)
-            training_labels.append(etiqueta)
+            if trainingdata is None:
+                trainingdata = imgecu1d.astype(np.float32)
+                trainingLabels = np.array([[etiqueta]]).astype(np.float32)
+            else:
+                trainingdata = np.append(trainingdata, imgecu1d.astype(np.float32), 0)
+                trainingLabels = np.append(trainingLabels, np.array([[etiqueta]]).astype(np.float32), 0)
 
         etiqueta += 1
 
-    # Convertir los datos y etiquetas en arreglos NumPy
-    training_data = np.array(training_data, dtype=np.float32)
-    training_labels = np.array(training_labels, dtype=np.float32)
+    print(trainingdata.shape)
 
-    print(training_data.shape)
-    
-    # Crear el clasificador KNN
     knn = cv2.ml.KNearest_create()
+    knn.train(trainingdata, cv2.ml.ROW_SAMPLE, trainingLabels)
 
-    # Entrenar el clasificador KNN con los datos de entrenamiento
-    knn.train(training_data, cv2.ml.ROW_SAMPLE, training_labels)
+    ret, result, neighbours, dist = knn.findNearest(trainingdata, k=vecinos)
+    correct = np.count_nonzero(result == trainingLabels)
+    print('Aciertos ' + ojo + '= ', correct)
 
     return knn
+
 
 
