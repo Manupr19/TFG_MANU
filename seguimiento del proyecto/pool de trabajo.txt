@@ -1,0 +1,5 @@
+depurar bug fichero views.py (249-252). es un for que lee mal archivos
+averiguar como depurar un codigo python en vscode. django v3.8?
+averiguar que es testing unitario 
+averiguar como se usan repositorios 
+averiguar como hacer testing unitario con repositorios

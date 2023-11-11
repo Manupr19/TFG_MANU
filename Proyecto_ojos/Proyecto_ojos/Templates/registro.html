@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Usuario</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            padding-top: 50px;
+        }
+        .form-register {
+            background-color: #f7f7f7;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="form-register">
+                    <h2 class="text-center">Registro de Usuario</h2>
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }} 
+                        <button type="submit" class="btn btn-primary btn-block">Registrarse</button>
+                    </form>
+                    <a href="/login" class="back-button">Atrás</a>                 
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
+

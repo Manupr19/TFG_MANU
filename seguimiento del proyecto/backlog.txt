@@ -1,0 +1,8 @@
+entrenar algoritmo ----
+    recorrer imagenes----
+desarrollo funcionalidad login 
+    añadir funcionalidad base de datos
+        escribir repositorio vontra sqlite 
+desarrollo del modulo principal 
+    desarrollo de las vistas 
+    conectar m.principal con algoritmo 

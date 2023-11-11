@@ -1,17 +1,12 @@
 from django.shortcuts import render
 import os
-from django.http import HttpResponse
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import dlib
 import numpy as np
 from django.shortcuts import render
-import time
-import tkinter as tk
 import cv2
-from PIL import Image, ImageTk
-from datetime import datetime
-import json
+import glob
 
 # Inicializa un arreglo para rastrear el estado de los botones
 pulsado = [0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -95,54 +90,9 @@ def clasificar(request):
     return JsonResponse({'message': 'Ojos clasificados y guardados correctamente'})
 
 
-def arrayTOimgtk(lectura):
-    b, g, r = cv2.split(lectura)
-    img = cv2.merge((r, g, b))
-    im = Image.fromarray(img)
-    imgtk = ImageTk.PhotoImage(image=im)
-    return imgtk
-
-root = tk.Tk()
-
-ALTO = root.winfo_screenheight() - 50
-ANCHO = root.winfo_screenwidth()
-ANCHO = 1900  # Lo pongo a mano por mis dos monitores
-root.config(width=ANCHO, height=ALTO)
-continua = 1
-root.title("Interfaz de Entrenamiento")
-# Creamos los marcos de ojos
-marconegroa = np.zeros((40, 70, 3), dtype=np.uint8)
-marconegrotk = arrayTOimgtk(marconegroa)
-
-marcos_ojos = []
-for i in range(9):
-    marcos_ojos.append([tk.Label(root, image=marconegrotk), tk.Label(root, image=marconegrotk)])
-
 
 def entrenador_views(request):
     return render(request, 'entrenador.html')
-
-def crea_directorios():
-    try:
-        os.stat(directorio_base)
-    except:
-        os.mkdir(directorio_base)
-
-    dirojos = ['ojoder', 'ojoizq']
-    for dir in dirojos:
-        try:
-            os.stat(directorio_base + dir + os.sep)
-        except:
-            os.mkdir(directorio_base + dir + os.sep)
-        for etiq in range(9):
-            try:
-                os.stat(directorio_base + dir + os.sep + dir + str(etiq))
-            except:
-                os.mkdir(directorio_base + dir + os.sep + dir + str(etiq))
-def crear_directorios_view(request):
-    crea_directorios()
-    return HttpResponse("Directorios creados con éxito")
-
 
 @csrf_exempt
 def guardar_imagenes(request):
@@ -173,62 +123,68 @@ def guardar_imagenes(request):
 
 
 
-
-
-def shape_to_np(shape, dtype="int"):
-    coords = np.zeros((68, 2), dtype=dtype)
-    for i in range(0, 68):
-        coords[i] = (shape.part(i).x, shape.part(i).y)
-    return coords
-
-def ajustar_gamma(imagen, gamma=1.0):
-    invGamma = 1.0 / gamma
-    table = np.array([((i / 255.0) ** invGamma) * 255 for i in np.arange(0, 256)]).astype("uint8")
-    return cv2.LUT(imagen, table)
-
-
 # Ruta base donde se encuentran las imágenes de entrenamiento normalizadas
-directorio_base = '/entrenamiento/fotos/fotosnormalizadas/'
-
 @csrf_exempt
 def entrenar_knn_para_todos_los_ojos(request):
+    # Verifica si la solicitud es un POST
     if request.method == 'POST':
         try:
-            # Obtener datos del formulario POST
-            panel_numero = request.POST['panel_numero']
-            ojo = request.POST['ojo']
-            vecinos = int(request.POST['vecinos'])
+            # Extrae datos del formulario POST: número de panel y número de vecinos (fijo en 3)
+            panel_numero = int(request.POST['panel_numero'])
+            vecinos = 3
+      
+            # Define la ruta base donde se encuentran las imágenes normalizadas
+            directorio_base = "../Proyecto_ojos/entrenamiento/fotos/fotosnormalizadas/"
 
-            # Ruta al directorio de imágenes para entrenamiento
-            directorio_entrenamiento = os.path.join(directorio_base, f'panel{panel_numero}', ojo)
+            # Entrena el modelo KNN para el ojo derecho
+            knn_derecho = entrenaoKNN(vecinos, panel_numero, 'der', directorio_base)
+           
+            # Entrena el modelo KNN para el ojo izquierdo
+            knn_izquierdo = entrenaoKNN(vecinos, panel_numero, 'izq', directorio_base)
 
-            # Llamar a la función entrenaoKNN con los parámetros proporcionados
-            knn = entrenaoKNN(vecinos, ojo, directorio_entrenamiento)
-
+            # Devuelve una respuesta JSON indicando que el entrenamiento se completó
             return JsonResponse({'status': 'Entrenamiento completado'})
         except Exception as e:
+            # Maneja cualquier excepción devolviendo un error en formato JSON
             return JsonResponse({'error': str(e)}, status=500)
 
+    # Devuelve un error si la solicitud no es POST
     return JsonResponse({'status': 'Error en la solicitud'}, status=400)
 
-def entrenaoKNN(vecinos, ojo, directorio_base):
-    clases = [ojo + str(i) for i in range(9)]
+def entrenaoKNN(vecinos, panel_numero, ojo, directorio_base):
+    # Genera nombres de clases basados en el ojo y el número de panel
+    clases = [f'ojo{ojo}_panel{panel_numero}_foto{i}' for i in range(1, 4)]
     etiqueta = 0
     trainingdata = None
     trainingLabels = None
 
+    # Define un tamaño estándar para todas las imágenes
+    tamano_imagen = (50, 50)
+
     for clase in clases:
-        input_images_path = os.path.join(directorio_base, clase)
-        files_names = os.listdir(input_images_path)
+        # Genera el nombre base para las imágenes de la clase actual
+        image_base_name = f'{clase}.jpg'
+        # Construye la ruta de entrada para las imágenes
+        input_images_path = os.path.join(directorio_base, f'panel{panel_numero}/')
+        # Establece un patrón para buscar archivos JPEG
+        file_pattern = os.path.join(input_images_path, '*.jpg')
+        # Obtiene los nombres de los archivos que coinciden con el patrón
+        files_names = glob.glob(file_pattern)
 
-        for fichero in files_names:
-            fichpath = os.path.join(input_images_path, fichero)
+        # Imprime la ruta y los nombres de los archivos para verificación
+        print(f'Ruta de la carpeta de imágenes: {input_images_path}')
+        print(f'El file_pattern es: {file_pattern}')
+        print(f'El files_names es: {files_names}')
+
+        for fichpath in files_names:
+            # Lee, redimensiona y convierte la imagen a escala de grises y luego la ecualiza
             img = cv2.imread(fichpath)
-
+            img = cv2.resize(img, tamano_imagen)
             imggray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             imgecu = cv2.equalizeHist(imggray)
-            imgecu1d = np.reshape(imgecu, (1, 2800))
+            imgecu1d = np.reshape(imgecu, (1, -1))
 
+            # Prepara los datos de entrenamiento y las etiquetas
             if trainingdata is None:
                 trainingdata = imgecu1d.astype(np.float32)
                 trainingLabels = np.array([[etiqueta]]).astype(np.float32)
@@ -236,18 +192,23 @@ def entrenaoKNN(vecinos, ojo, directorio_base):
                 trainingdata = np.append(trainingdata, imgecu1d.astype(np.float32), 0)
                 trainingLabels = np.append(trainingLabels, np.array([[etiqueta]]).astype(np.float32), 0)
 
-        etiqueta += 1
+            etiqueta += 1
 
-    print(trainingdata.shape)
+        # Imprime la forma de los datos de entrenamiento para verificación
+        if trainingdata is not None:
+            print(trainingdata.shape)
 
+    # Crea y entrena el modelo KNN
     knn = cv2.ml.KNearest_create()
     knn.train(trainingdata, cv2.ml.ROW_SAMPLE, trainingLabels)
 
+    # Encuentra el vecino más cercano y verifica la precisión
     ret, result, neighbours, dist = knn.findNearest(trainingdata, k=vecinos)
-    correct = np.count_nonzero(result == trainingLabels)
-    print('Aciertos ' + ojo + '= ', correct)
+    if trainingLabels is not None:
+        correct = np.count_nonzero(result == trainingLabels)
+        print(f'Aciertos ojo{ojo} = {correct}')
+    else:
+        print('No hay etiquetas de entrenamiento disponibles.')
 
+    # Devuelve el modelo KNN entrenado
     return knn
-
-
-

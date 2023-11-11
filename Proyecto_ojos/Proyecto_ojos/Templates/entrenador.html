@@ -315,16 +315,30 @@ async function tomarFotos(panelIndex) {
         // Una vez que se han guardado las imágenes, llamar a la función para clasificar
         await new Promise(resolve => setTimeout(resolve, 5000)); // 3000 milisegundos (3 segundos)
 
-
         if (guardarResponse.ok) {
-            const clasificarResponse = await fetch(`/clasifica/`, {
-                method: 'POST',
-                body: formData,
-            }).then(response => response.json());
-            console.log(clasificarResponse);
-        } else {
-            console.error('Error al guardar imágenes');
-        }
+    const clasificarResponse = await fetch(`/clasifica/`, {
+        method: 'POST',
+        body: formData,
+    }).then(response => response.json());
+
+    
+        // Ahora puedes acceder a clasificarResponse aquí
+        console.log(clasificarResponse);
+        
+        // Realizar la solicitud a /entrena dentro de este bloque
+        
+       // formData.append('vecinos', 3);
+
+        const EntrenarResponse = await fetch(`/entrena/`, {
+            method: 'POST',
+            body: formData,
+        }).then(response => response.json());
+        
+        console.log(EntrenarResponse);
+    } else {
+        console.error('Error en la clasificación');
+    }
+
     } catch (error) {
         console.error('Error al acceder a la cámara: ', error);
     }
@@ -332,7 +346,7 @@ async function tomarFotos(panelIndex) {
 
 
 async function clasificarImagen(panelIndex, fotos) {
-    // Simplemente utiliza el código que tenías para clasificar
+   
     // Reemplaza esta URL por la URL correcta para clasificar
     return await fetch(`/clasifica/`, {
         method: 'POST',
