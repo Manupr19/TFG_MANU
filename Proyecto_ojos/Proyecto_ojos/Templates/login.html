@@ -40,7 +40,15 @@
 </style>
 
 <div class="container">
-   <form class="form-signin" method="POST" action="">
+     {% if messages %}
+        <div id="welcomePopup" class="popup" style="position: fixed; top: 35%; left: 50%; transform: translateX(-50%); background-color: white; padding: 25px; border-radius: 10px; box-shadow: 0 5px 10px rgba(0,0,0,0.1); z-index: 1000; text-align: center; font-size: 16px;"> <!-- Aumentar tamaño de la letra aquí -->
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+            <button onclick="document.getElementById('welcomePopup').style.display='none'" style="margin-top: 20px; display: block; margin-left: auto; margin-right: auto; font-size: 16px;">Continuar</button> <!-- Ajustar tamaño de la letra del botón -->
+        </div>
+    {% endif %}
+   <form class="form-signin" method="POST" action="/logeate/">
       {% csrf_token %}
       <h2 class="text-center">Inicio de sesión</h2>
       <div class="form-group">

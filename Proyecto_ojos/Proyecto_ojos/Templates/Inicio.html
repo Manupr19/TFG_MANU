@@ -42,14 +42,26 @@
 
 <div class="container mt-5">
     <div class="row">
-        <div class="col-md-4 text-center mb-3">
-            <a href="/login"> 
-                <div class="turquoise-box">
-                    <i class="fas fa-sign-in-alt fa-5x"></i>
-                    <h4>Iniciar sesión</h4>
-                </div>
-            </a>
-        </div>
+        <!-- Condición para mostrar Iniciar Sesión o Abandonar Sesión -->
+        {% if request.user.is_authenticated %}
+            <div class="col-md-4 text-center mb-3">
+                <a href="/deslog"> 
+                    <div class="turquoise-box">
+                        <i class="fas fa-sign-out-alt fa-5x"></i>
+                        <h4>Abandonar sesión</h4>
+                    </div>
+                </a>
+            </div>
+        {% else %}
+            <div class="col-md-4 text-center mb-3">
+                <a href="/logeate"> 
+                    <div class="turquoise-box">
+                        <i class="fas fa-sign-in-alt fa-5x"></i>
+                        <h4>Iniciar sesión</h4>
+                    </div>
+                </a>
+            </div>
+        {% endif %}
         <div class="col-md-4 text-center mb-3">
             <a href="/entrenamiento"> 
                 <div class="turquoise-box">
@@ -59,7 +71,7 @@
             </a>
         </div>
         <div class="col-md-4 text-center mb-3">
-            <a href="pagina3.html">
+            <a href="/panel">
                 <div class="turquoise-box">
                     <i class="fas fa-play-circle fa-5x"></i>
                     <h4>Iniciar aplicación</h4>
@@ -69,12 +81,22 @@
     </div>
     <div class="row mt-4">
         <div class="col-md-12">
-            <p>Aplicación Web sobre comunicación asistida mediante seguimiento ocular</p>
+            <h2 style="text-align: center;">Aplicación Web sobre comunicación asistida mediante seguimiento ocular</h2>
+
             <p>Este proyecto consiste en el desarrollo de una aplicación web funcional que permita a cualquier persona con
                 dificultades en el habla poder efectuarla mediante sus ojos, para ello se realizará el conveniente procesado de
                 imágenes, tomadas desde la webcam, mediante algoritmos de aprendizaje automático y se realizará un backend y un
                 frontend con tecnologías actuales.</p>
         </div>
+        {% if messages %}
+        <div id="welcomePopup" class="popup" style="position: fixed; top: 5%; left: 50%; transform: translateX(-50%); background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 1000; text-align: center; font-size: 25px;"> <!-- Aumentar tamaño de la letra aquí -->
+            {% for message in messages %}
+                <p>{{ message }}</p>
+            {% endfor %}
+            <button onclick="document.getElementById('welcomePopup').style.display='none'" style="margin-top: 20px; display: block; margin-left: auto; margin-right: auto; font-size: 16px;">Continuar</button> <!-- Ajustar tamaño de la letra del botón -->
+        </div>
+    {% endif %}
+    
     </div>
 
     <!-- Agrega enlaces a las bibliotecas de Bootstrap y Font Awesome para los iconos -->
@@ -84,9 +106,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
     
   
-    <img class="bottom-image" src="https://www.uhu.es/etsi/wp-content/uploads/2016/02/membrete_ETSI.jpg" alt="Manuel Ángel Pazos Ruiz" style="max-width: 500px; max-height: 200px; position: relative; bottom: 20px; left: 50%; transform: translateX(-50%);">
+    <img class="bottom-image" src="https://pbs.twimg.com/media/F-6Lh-RWAAAnqmo?format=jpg&name=medium" alt="Manuel Ángel Pazos Ruiz" style="max-width: 500px; max-height: 200px; position: relative; bottom: 5px; left: 50%; transform: translateX(-50%);">
     <p style="text-align: center;">© 2023 Manuel Ángel Pazos Ruiz</p>
-
+    
 </div>
 
 </body>

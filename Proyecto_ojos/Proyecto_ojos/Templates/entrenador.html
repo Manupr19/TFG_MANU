@@ -10,7 +10,13 @@
             padding: 10px;
             border: 1px solid red;
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 150px; /* Puedes ajustar esto según tus necesidades */
         }
+
 
         ul {
             list-style-type: none;
@@ -25,16 +31,6 @@
             text-align: center;
         }
 
-        .panel-ampliado {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 999;
-        }
 
         /* Estilos para las letras en el contenido ampliado */
         .letras-lista li {
@@ -45,19 +41,6 @@
             align-items: center; /* Centrar verticalmente el contenido */
         }
 
-        .contenido-ampliado {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 20px;
-            border: 1px solid black;
-            text-align: center;
-        }
 
         /* Estilos para las letras en el contenido ampliado */
         .contenido-ampliado li {
@@ -100,11 +83,51 @@
             /* Asegura que ocupe todo el ancho */
         }
 
-        .middel-panels-container{
+        .middel-panels-container {
             position: absolute;
-            top: 45%;
-            width: 100%;
+            top: 50%;
+            left: 35%; /* Centrar horizontalmente */
+            transform: translate(-50%, -50%); /* Ajustar para un centrado perfecto */
+            width: 80%; /* Ajusta este valor según sea necesario */
+            display: flex;
+            justify-content: center; /* Alineación horizontal */
+            align-items: center; /* Alineación vertical */
         }
+
+        .middel-panels-container > div {
+            text-align: center; /* Asegura que el texto esté centrado */
+        }
+
+        .estado-circulo {
+        width: 60px;
+        height: 70px;
+        border-radius: 70%;
+        background-color: red;
+        margin: 10px auto; /* Centrar horizontalmente */
+    }
+        .video-centrado {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: 300px; /* Tamaño más pequeño */
+        height: auto; /* Altura automática para mantener la relación de aspecto */
+        transform: translate(-50%, -50%);
+        z-index: 1000; /* Asegurarse de que esté por encima de otros elementos */
+    }
+        .letras-panel {
+        /* Tus estilos existentes... */
+        visibility: hidden; /* Inicia con los paneles ocultos */
+        opacity: 0;
+        pointer-events: none; /* Desactiva eventos de ratón cuando esté oculto */
+        transition: opacity 0.5s linear; /* Transición suave para la opacidad */
+    }
+
+        .letras-panel.visible {
+            visibility: visible;
+            opacity: 1;
+            pointer-events: auto; /* Activa eventos de ratón cuando esté visible */
+        }
+
     </style>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -115,73 +138,60 @@
 </head>
 
 <body>
+      <!-- Botón de Atrás -->
+      <div class="boton-atras-container" style="margin-top: 10px;margin-left:10px;">
+        <button onclick="window.location.href='/inicio';">Atrás</button>
+    </div>
     <br><br>
+    
     <div class="row gx-5 top-panels-container">
-        <div class="letras-panel col-lg-2 offset-lg-1 col-sm-3 offset-sm-1" data-panel-index="1">
+        
+         <div class="letras-panel col-lg-2 offset-lg-1 col-sm-3 offset-sm-1" data-panel-index="1">
             <h2>Panel 1</h2>
-            <ul class="letras-lista" data-lista-index="1">
-                <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
-            </ul>
-            <button onclick="tomarFotos(1)">Tomar Fotos</button>
-           
+            <ul class="estado-circulo" id="circulo-panel-1"></ul>
+            
         </div>
 
         <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="2">
             <h2>Panel 2</h2>
-            <ul class="letras-lista" data-lista-index="2">
-                <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
-            </ul>
-            <button onclick="tomarFotos(2)">Tomar Fotos</button>
+            <ul class="estado-circulo" id="circulo-panel-2"></ul>
+            
        
         </div>
 
         <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="3">
             <h2>Panel 3</h2>
-            <ul class="letras-lista" data-lista-index="3">
-                <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
-            </ul>
-            <button onclick="tomarFotos(3)">Tomar Fotos</button>
+            <ul class="estado-circulo" id="circulo-panel-3"></ul>
+            
           
         </div>
     </div>
 
     <div class="row gx-5 middel-panels-container">
         <div class="    offset-lg-4 col-lg-6 col-sm-3 offset-sm-1" data-panel-index="2">
-            <h2>ENTRENADOR</h2>
-            <a href="/inicio">
-                <div class="turquoise-box">
-                    <i class="fas fa-sign-in-alt fa-5x"></i>
-                    <h4>Atras</h4>
-                </div>
-            </a>
+           <div></div>
         </div>
     </div>
 
     <div class="row gx-5 bottom-panels-container">
         <div class="letras-panel col-lg-2 offset-lg-1 col-sm-3 offset-sm-1" data-panel-index="4">
             <h2>Panel 4</h2>
-            <ul class="letras-lista" data-lista-index="4">
-                <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
-            </ul>
-            <button onclick="tomarFotos(4)">Tomar Fotos</button>
+            <ul class="estado-circulo" id="circulo-panel-4"></ul>
+            
          
         </div>
 
         <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="5">
             <h2>Panel 5</h2>
-            <ul class="letras-lista" data-lista-index="5">
-                <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
-            </ul>
-            <button onclick="tomarFotos(5)">Tomar Fotos</button>
+            <ul class="estado-circulo" id="circulo-panel-5"></ul>
+            
          
         </div>
 
         <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="6">
             <h2>Panel 6</h2>
-            <ul class="letras-lista" data-lista-index="6">
-                <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
-            </ul>
-            <button onclick="tomarFotos(6)">Tomar Fotos</button>
+            <ul class="estado-circulo" id="circulo-panel-6"></ul>
+           
            
         </div>
     </div>
@@ -196,6 +206,7 @@
     </div>
 
     <script>
+        
         // Letras para cada panel
         const paneles = [
             ["A", "B", "C", "D", "E", "F"],
@@ -205,6 +216,37 @@
             ["0", "1", "2", "3", "4", "5"],
             ["6", "7", "8", "9", "\u00AE", "\u00A9"] // Los caracteres especiales deben estar escapados
         ];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            if (confirm("NOTA: va a dar comienzo el entrenimiento mira a los puntos en rojo hasta que se pongan en color verde ¿Comenzar entrenamiento?")) {
+                iniciarEntrenamiento();
+            }
+        });
+
+        let panelActual = 1; // Variable global para rastrear el panel actual
+
+        async function iniciarEntrenamiento() {
+            for (let i = panelActual; i <= 6; i++) {
+                mostrarPanel(i); // Muestra solo el panel actual
+                await tomarFotos(i);
+                // Espera un tiempo antes de pasar al siguiente panel (p.ej. 3 segundos)
+                await new Promise(resolve => setTimeout(resolve, 3500));
+                panelActual = i + 1; // Actualiza el panel actual al siguiente
+            }
+        }
+        function mostrarPanel(panelIndex) {
+    // Oculta todos los paneles
+    const paneles = document.querySelectorAll(".letras-panel");
+    paneles.forEach(panel => {
+        panel.classList.remove('visible');
+    });
+
+    // Muestra solo el panel actual
+    const panelActual = document.querySelector(`.letras-panel[data-panel-index="${panelIndex}"]`);
+    if (panelActual) {
+        panelActual.classList.add('visible');
+    }
+}
 
         // Función para crear y agregar elementos <li> al panel
         function crearListaLetras(panelIndex, ulId) {
@@ -238,6 +280,17 @@
 
             contenidoAmpliado.style.display = "block";
         }
+        // Función para comprobar si todos los paneles están en verde
+            async function verificarPanelesEnVerde() {
+                const circulos = document.querySelectorAll('.estado-circulo');
+                const todosEnVerde = Array.from(circulos).every(circulo => circulo.style.backgroundColor === 'green');
+
+                if (todosEnVerde) {
+                    if (confirm("Todos los paneles están calibrados. ¿Deseas volver al menú principal?")) {
+                        window.location.href = '/inicio'; // Redireccionar al menú principal
+                    }
+                }
+            }
 
         // Asignar el evento de clic a cada panel
         const panelesClick = document.querySelectorAll(".letras-panel");
@@ -258,6 +311,7 @@ async function tomarFotos(panelIndex) {
 
         // Crear un elemento de video para mostrar el flujo de la cámara
         const video = document.createElement('video');
+        video.classList.add('video-centrado'); // Aplicar los estilos centrados
         document.body.appendChild(video);
         video.srcObject = stream;
         await video.play();
@@ -297,13 +351,12 @@ async function tomarFotos(panelIndex) {
         });
 
         if (imagenesValidas.length === 0) {
-            console.error('No se cargaron imágenes válidas');
+            alert('No se cargaron imágenes válidas. Se reiniciará el proceso.');
+            reiniciarEntrenamiento();
             return;
         }
 
         const panelNumero = panelIndex;
-
-        // Agregar información adicional al formulario
         formData.append('panel_numero', panelNumero);
 
         // Enviar el formulario al servidor para guardar las imágenes
@@ -312,38 +365,58 @@ async function tomarFotos(panelIndex) {
             body: formData,
         });
 
+        if (!guardarResponse.ok) {
+            const guardarData = await guardarResponse.json();
+            alert(`Error al guardar imágenes: ${guardarData.error}. Se reiniciará el proceso.`);
+            reiniciarEntrenamiento();
+            return;
+        }
+
         // Una vez que se han guardado las imágenes, llamar a la función para clasificar
-        await new Promise(resolve => setTimeout(resolve, 5000)); // 3000 milisegundos (3 segundos)
+        await new Promise(resolve => setTimeout(resolve, 3000)); // Esperar 5 segundos
 
-        if (guardarResponse.ok) {
-    const clasificarResponse = await fetch(`/clasifica/`, {
-        method: 'POST',
-        body: formData,
-    }).then(response => response.json());
+        const clasificarResponse = await fetch(`/clasifica/`, {
+            method: 'POST',
+            body: formData,
+        });
 
-    
-        // Ahora puedes acceder a clasificarResponse aquí
-        console.log(clasificarResponse);
-        
-        // Realizar la solicitud a /entrena dentro de este bloque
-        
-       // formData.append('vecinos', 3);
+        const clasificarData = await clasificarResponse.json();
+        if (!clasificarResponse.ok) {
+            alert(`Error al clasificar: ${clasificarData.error}. Se reiniciará el proceso.`);
+            reiniciarEntrenamiento();
+            return;
+        }
+
+        console.log(clasificarData);
+        document.getElementById(`circulo-panel-${panelIndex}`).style.backgroundColor = 'green';
 
         const EntrenarResponse = await fetch(`/entrena/`, {
             method: 'POST',
             body: formData,
-        }).then(response => response.json());
-        
-        console.log(EntrenarResponse);
-    } else {
-        console.error('Error en la clasificación');
-    }
+        });
 
+        const entrenarData = await EntrenarResponse.json();
+        if (!EntrenarResponse.ok) {
+            alert(`Error al entrenar: ${entrenarData.error}. Se reiniciará el proceso.`);
+            reiniciarEntrenamiento();
+            return;
+        }
+
+        console.log(entrenarData);
+        verificarPanelesEnVerde();
     } catch (error) {
-        console.error('Error al acceder a la cámara: ', error);
+        console.error('Error: ', error);
+        alert('Se produjo un error durante el proceso de entrenamiento. Se reiniciará el proceso.');
+        reiniciarEntrenamiento();
     }
 }
 
+async function reiniciarEntrenamiento() {
+    // Mostrar un mensaje de error y preguntar al usuario si quiere reiniciar
+    if (confirm("Hubo un error en el entrenamiento. ¿Deseas intentarlo de nuevo?")) {
+        location.reload(); // Recarga la página completa
+    }
+}
 
 async function clasificarImagen(panelIndex, fotos) {
    

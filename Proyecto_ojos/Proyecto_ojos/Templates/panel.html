@@ -105,6 +105,20 @@
             width: 100%;
         }
 
+        .boton-atras-container {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+    }
+    .video-centrado {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: 300px; /* Tamaño más pequeño */
+        height: auto; /* Altura automática para mantener la relación de aspecto */
+        transform: translate(-50%, -50%);
+        z-index: 1000; /* Asegurarse de que esté por encima de otros elementos */
+    }
         
     </style>
 
@@ -116,6 +130,11 @@
 </head>
 
 <body>
+        <!-- Botón de Atrás -->
+        <div class="boton-atras-container">
+            <button onclick="window.location.href='/inicio';">Atrás</button>
+        </div>
+    
     <br><br>
     <div class="row gx-5 top-panels-container">
 
@@ -147,7 +166,8 @@
 
 
         <div class="    offset-lg-4 col-lg-6 col-sm-3 offset-sm-1" data-panel-index="2">
-            <h2>aqui ira la palabra seleccionada</h2>
+            <h2 id="area-central"></h2> 
+            <button id="btnTomarFoto">Tomar Foto</button>
         </div>
 
 
@@ -158,21 +178,21 @@
         <div class="letras-panel col-lg-2 offset-lg-1 col-sm-3 offset-sm-1" data-panel-index="4">
             <h2>Panel 4</h2>
             <ul class="letras-lista" data-lista-index="4">
-                <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
+             
             </ul>
         </div>
 
         <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="5">
             <h2>Panel 5</h2>
             <ul class="letras-lista" data-lista-index="5">
-                <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
+               
             </ul>
         </div>
 
         <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="6">
             <h2>Panel 6</h2>
             <ul class="letras-lista" data-lista-index="6">
-                <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
+               
             </ul>
         </div>
     </div>
@@ -181,13 +201,24 @@
     <div class="panel-ampliado" id="panel-ampliado">
         <div class="contenido-ampliado">
             <ul class="letras-lista" id="letras-lista-ampliada">
-                <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
+                
             </ul>
         </div>
     </div>
+    {% if messages %}
+    <div id="welcomePopup" class="popup" style="position: fixed; top: 35%; left: 50%; transform: translateX(-50%); background-color: white; padding: 25px; border-radius: 10px; box-shadow: 0 5px 10px rgba(0,0,0,0.1); z-index: 1000; text-align: center; font-size: 16px;"> <!-- Aumentar tamaño de la letra aquí -->
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+        <button onclick="document.getElementById('welcomePopup').style.display='none'" style="margin-top: 20px; display: block; margin-left: auto; margin-right: auto; font-size: 16px;">Continuar</button> <!-- Ajustar tamaño de la letra del botón -->
+    </div>
+{% endif %}
 
     <script>
-        // Letras para cada panel
+        //cargamos modelos entrenados
+       // knn_derecho = cv2.ml.KNearest_load('knn_derecho.xml')
+       // knn_izquierdo = cv2.ml.KNearest_load('knn_izquierdo.xml')
+         // Letras para cada panel
         const paneles = [
             ["A", "B", "C", "D", "E", "F"],
             ["G", "H", "I", "J", "K", "L"],
@@ -196,6 +227,12 @@
             ["0", "1", "2", "3", "4", "5"],
             ["6", "7", "8", "9", "\u00AE", "\u00A9"] 
         ];
+        let availableVoices = []; // Almacenará las voces disponibles
+
+        // Cargar y almacenar las voces tan pronto como estén disponibles
+        window.speechSynthesis.onvoiceschanged = function() {
+            availableVoices = window.speechSynthesis.getVoices();
+        };
 
         // Función para crear y agregar elementos <li> al panel
         function crearListaLetras(panelIndex, ulId) {
@@ -241,8 +278,7 @@
         panelesClick.forEach(panel => {
             const panelIndex = panel.getAttribute("data-panel-index");
             panel.addEventListener("click", () => {
-                //mostrarContenidoAmpliado(panelIndex);
-                //****aqui deberia abrirse la pantalla asociada al panel 
+                abrirPanelSeleccionado(panelIndex);
             });
         });
 
@@ -251,6 +287,139 @@
         panelAmpliado.addEventListener("click", () => {
             ocultarContenidoAmpliado();
         });
+
+        function abrirPanelSeleccionado(panelIndex) {
+    const url = `/seleccionpanel${panelIndex}/`; // Construye la URL dinámica
+    window.location.href = url; // Redirige a la URL en la misma ventana
+
+}
+
+window.addEventListener('load', () => {
+        const palabra = localStorage.getItem('palabra') || '';
+        const areaCentral = document.getElementById("area-central");
+        if (areaCentral) {
+            areaCentral.textContent = palabra; // Muestra la palabra acumulada
+        }
+    });
+
+    // Esta función toma fotos desde la cámara, las envía al servidor Django
+// para su procesamiento y realiza el entrenamiento.
+
+        // Esta función convierte un data URL a un blob
+        function dataURItoBlob(dataURI) {
+            const byteString = atob(dataURI.split(',')[1]);
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([ab], { type: 'image/jpeg' });
+        }
+
+contador =1;
+async function tomarFotos(panelIndex) {
+    try {
+        // Acceder a la cámara
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+
+        // Crear un elemento de video para mostrar el flujo de la cámara
+        const video = document.createElement('video');
+        video.classList.add('video-centrado');
+        document.body.appendChild(video);
+        video.srcObject = stream;
+        await video.play();
+
+        // Crear un lienzo (canvas) para capturar y procesar las imágenes
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+
+        // Capturar 1 foto
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataURL = canvas.toDataURL('image/jpeg');
+
+        // Detener el flujo de la cámara y eliminar los elementos HTML
+        stream.getTracks().forEach(track => track.stop());
+        document.body.removeChild(video);
+
+        // Comprobar si la imagen se cargó correctamente antes de guardarla
+        const formData = new FormData();
+        const blob = dataURItoBlob(dataURL);
+        if (!blob) {
+            alert('No se cargó una imagen válida. Se reiniciará el proceso.');
+            return;
+        }
+
+        formData.append('imagen', blob, `panel${panelIndex}_foto.jpg`);
+        const panelNumero = panelIndex;
+        formData.append('panel_numero', contador);
+        contador += 1;
+
+        // Enviar el formulario al servidor para guardar las imágenes
+        const guardarResponse = await fetch(`/guardar_imagenesusu/`, {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!guardarResponse.ok) {
+            const guardarData = await guardarResponse.json();
+            alert(`Error al guardar imágenes: ${guardarData.error}. Se reiniciará el proceso.`);
+            return;
+        }
+
+        // Esperar 3 segundos antes de clasificar
+        await new Promise(resolve => setTimeout(resolve, 3000));
+
+        // Clasificar la imagen
+        const clasificarResponse = await fetch(`/clasificausu/`, {
+            method: 'POST',
+            body: formData,
+        });
+
+        const clasificarData = await clasificarResponse.json();
+        if (!clasificarResponse.ok) {
+            alert(`Error al clasificar: ${clasificarData.error}.`);
+            return;
+        }
+
+        console.log(clasificarData);
+
+        const csrfToken = getCsrfToken(); // Obtén el token CSRF
+
+const EntrenarResponse = await fetch(`/predice${panelIndex}/`, {
+    method: 'POST',
+    headers: {
+        'X-CSRFToken': csrfToken, // Incluye el token CSRF en las cabeceras
+        // Aquí puedes incluir otras cabeceras si son necesarias
+    },
+    body: formData,
+});
+       
+
+    } catch (error) {
+        console.error('Error: ', error);
+        alert('Se produjo un error durante el proceso.');
+    }
+}
+
+
+document.getElementById('btnTomarFoto').addEventListener('click', function() {
+    tomarFotos(1); // Aquí puedes pasar el índice del panel que desees
+});
+
+function getCsrfToken() {
+    let csrfToken = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, 'csrftoken'.length + 1) === ('csrftoken' + '=')) {
+                csrfToken = decodeURIComponent(cookie.substring('csrftoken'.length + 1));
+                break;
+            }
+        }
+    }
+    return csrfToken;
+}
 
     </script>
 </body>

@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Panel 3</title>
+    <title>Panel 2</title>
     <style>
         /* Estilos CSS para el panel */
         .letras-panel {
@@ -122,21 +122,18 @@
         <div class="letras-panel col-lg-2 offset-lg-1 col-sm-3 offset-sm-1" data-panel-index="1">
             <h2>Panel 1</h2>
             <ul class="letras-lista" data-lista-index="1">
-                <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
         </div>
 
         <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="2">
             <h2>Panel  2</h2>
             <ul class="letras-lista" data-lista-index="2">
-                <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
         </div>
 
         <div class="letras-panel col-lg-2 offset-lg-2 col-sm-3 offset-sm-1" data-panel-index="3">
             <h2>Panel 3</h2>
             <ul class="letras-lista" data-lista-index="3">
-                <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
             </ul>
         </div>
 
@@ -146,8 +143,8 @@
 
 
 
-        <div class="    offset-lg-4 col-lg-6 col-sm-3 offset-sm-1" data-panel-index="2">
-            <h2>aqui ira la palabra seleccionada</h2>
+        <div class="offset-lg-4 col-lg-6 col-sm-3 offset-sm-1" data-panel-index="2">
+            <h2 id="area-central"></h2> <!-- Área central para mostrar la letra seleccionada -->
         </div>
 
 
@@ -189,12 +186,7 @@
     <script>
         // Letras para cada panel
         const paneles = [
-            ["M"],
-            ["N"],
-            ["Ñ"],
-            ["O"],
-            ["P"],
-            ["Q"] 
+            ["M"], ["N"], ["Ñ"], ["O"], ["P"], ["Q"] 
         ];
 
         // Función para crear y agregar elementos <li> al panel
@@ -215,43 +207,26 @@
 
         // Función para mostrar el contenido ampliado
         function mostrarContenidoAmpliado(panelIndex) {
-            const letrasLista = paneles[panelIndex - 1];
-            const letrasListaAmpliada = document.getElementById("letras-lista-ampliada");
-            const contenidoAmpliado = document.getElementById("panel-ampliado");
+            const letraSeleccionada = paneles[panelIndex - 1][0]; // Obtiene la primera letra del panel seleccionado
+            const areaCentral = document.getElementById("area-central");
+            const palabraActual = localStorage.getItem('palabra') || ''; // Obtener la palabra actual o iniciar como cadena vacía
+            localStorage.setItem('palabra', palabraActual + letraSeleccionada); // Agregar la letra seleccionada a la palabra
 
-            letrasListaAmpliada.innerHTML = ""; // Limpiar el contenido anterior
+            areaCentral.textContent = letraSeleccionada; // Muestra la letra en el área central
 
-            letrasLista.forEach(letra => {
-                const listItem = document.createElement("li");
-                listItem.textContent = letra;
-                letrasListaAmpliada.appendChild(listItem);
-            });
-
-            contenidoAmpliado.style.display = "block";
+            // Espera 2 segundos y luego redirige
+            setTimeout(() => {
+                window.location.href = "/panel";
+            }, 2000);
         }
-
-        // Función para ocultar el contenido ampliado
-        function ocultarContenidoAmpliado() {
-            const contenidoAmpliado = document.getElementById("panel-ampliado");
-            contenidoAmpliado.style.display = "none";
-        }
-
         // Asignar el evento de clic a cada panel
         const panelesClick = document.querySelectorAll(".letras-panel");
         panelesClick.forEach(panel => {
-            const panelIndex = panel.getAttribute("data-panel-index");
             panel.addEventListener("click", () => {
-                //mostrarContenidoAmpliado(panelIndex);
-                //****aqui deberia abrirse la pantalla asociada al panel 
+                const panelIndex = panel.getAttribute("data-panel-index");
+                mostrarContenidoAmpliado(panelIndex);
             });
         });
-
-        // Asignar el evento de clic al fondo oscuro para ocultar el contenido ampliado
-        const panelAmpliado = document.getElementById("panel-ampliado");
-        panelAmpliado.addEventListener("click", () => {
-            ocultarContenidoAmpliado();
-        });
-
     </script>
 </body>
 

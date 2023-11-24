@@ -5,13 +5,13 @@ from django.views.decorators.csrf import csrf_exempt
 import dlib
 import numpy as np
 from django.shortcuts import render
-import time
 import tkinter as tk
 import cv2
 from PIL import Image, ImageTk
-from datetime import datetime
-import json
 import glob
+from django.shortcuts import redirect
+from django.contrib import messages
+
 
 # Inicializa un arreglo para rastrear el estado de los botones
 pulsado = [0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -80,12 +80,88 @@ def clasificar(request):
                                     ojo_recortado2 = img[y1_right:y2_right, x1_right:x2_right]
                                     ruta_ojo_der = f'{directorio_ojos}ojoder_{archivo}'
                                     cv2.imwrite(ruta_ojo_der, ojo_recortado2)
+
+                                    
                             else:
                                 # Manejar el caso en el que no se detectaron caras en la imagen
-                                print("No se detectaron caras en la imagen")
+                                return JsonResponse({'error': 'No se detectaron caras en la imagen'}, status=400)
                     else:
                         # Manejar el caso en el que no se detectaron caras en la imagen
-                        print("No se detectaron caras en la imagen")
+                        return JsonResponse({'error': 'No se detectaron caras en la imagen'}, status=400)
+                else:
+                    # Manejar el caso en el que la imagen no se cargó correctamente
+                    print(f"No se pudo cargar la imagen: {img_path}")
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'message': 'Ojos clasificados y guardados correctamente'})
+
+@csrf_exempt
+def clasificarusu(request):
+    global directorio_base
+
+    # Obtener el número de panel desde la solicitud
+    numero_seleccionado = request.POST['panel_numero']
+
+    # Directorio de imágenes capturadas desde el primer código
+    directorio_imagenes = f'entrenamiento/fotos/fotosusuarios'
+
+    # Directorio donde se guardarán los ojos normalizados
+    directorio_ojos = f'entrenamiento/fotos/fotosusuarios/fotosnormalizadas/panel{numero_seleccionado}/'
+    print(directorio_ojos)
+    try:
+        # Verificar si el directorio de ojos normalizados existe, si no, créalo
+        if not os.path.exists(directorio_ojos):
+            os.makedirs(directorio_ojos)
+
+        # Listar archivos en el directorio de imágenes capturadas
+        archivos = os.listdir(directorio_imagenes)
+        for archivo in archivos:
+            if archivo.endswith('.jpg'):
+                img_path = os.path.join(directorio_imagenes, archivo)
+
+                # Leer la imagen desde el archivo
+                img = cv2.imread(img_path)
+
+                # Verificar si la imagen se cargó correctamente
+                if img is not None:
+                    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+                    # Detectar caras en la imagen
+                    rects = detector(gray)
+                    if len(rects) > 0:
+                        for rect in rects:
+                            # Obtener landmarks faciales
+                            shape = predictor(gray, rect)
+
+                            # Verificar que se detectaron caras
+                            if len(shape.parts()) >= 68:
+                                # Recortar y guardar los ojos izquierdo y derecho
+                         # Ajusto los puntos de inicio y fin para una región mucho más grande
+                                x1_left, y1_left = shape.part(36).x - 20, shape.part(37).y - 20
+                                x2_left, y2_left = shape.part(39).x + 20, shape.part(41).y + 20
+                                x1_right, y1_right = shape.part(42).x - 20, shape.part(43).y - 20
+                                x2_right, y2_right = shape.part(45).x + 20, shape.part(47).y + 20
+                                # Verifica que las coordenadas sean válidas
+                                if x1_left >= 0 and y1_left >= 0 and x2_left >= 0 and y2_left >= 0:
+                                    # Realiza el recorte y guarda el ojo izquierdo
+                                    ojo_recortado1 = img[y1_left:y2_left, x1_left:x2_left]
+                                    ruta_ojo_izq = f'{directorio_ojos}ojoizq_{archivo}'
+                                    cv2.imwrite(ruta_ojo_izq, ojo_recortado1)
+
+                                if x1_right >= 0 and y1_right >= 0 and x2_right >= 0 and y2_right >= 0:
+                                    # Realiza el recorte y guarda el ojo derecho
+                                    ojo_recortado2 = img[y1_right:y2_right, x1_right:x2_right]
+                                    ruta_ojo_der = f'{directorio_ojos}ojoder_{archivo}'
+                                    cv2.imwrite(ruta_ojo_der, ojo_recortado2)
+
+                                    
+                            else:
+                                # Manejar el caso en el que no se detectaron caras en la imagen
+                                return JsonResponse({'error': 'No se detectaron caras en la imagen'}, status=400)
+                    else:
+                        # Manejar el caso en el que no se detectaron caras en la imagen
+                        return JsonResponse({'error': 'No se detectaron caras en la imagen'}, status=400)
                 else:
                     # Manejar el caso en el que la imagen no se cargó correctamente
                     print(f"No se pudo cargar la imagen: {img_path}")
@@ -120,7 +196,11 @@ for i in range(9):
 
 
 def entrenador_views(request):
-    return render(request, 'entrenador.html')
+       if not request.user.is_authenticated:
+        messages.error(request, "Debes iniciar sesión para acceder al entrenamiento.")
+        return redirect('/logeate')
+       else:
+        return render(request, 'entrenador.html')
 
 def crea_directorios():
     try:
@@ -171,6 +251,34 @@ def guardar_imagenes(request):
 
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
+@csrf_exempt
+def guardar_imagenesusu(request):
+    if request.method == 'POST':
+        try:
+            # Accede al parámetro "panel_numero" desde el cuerpo de la solicitud POST
+            panel_numero = request.POST.get('panel_numero')
+
+            # Asegúrate de que la carpeta "fotos" existe en la aplicación "entrenamiento"
+            fotos_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fotos')
+
+            # Crea una subcarpeta dentro de "fotos" con el nombre "panel+numero"
+            panel_dir = os.path.join(fotos_dir, f'fotosusuarios')
+            if not os.path.exists(panel_dir):
+                os.makedirs(panel_dir)
+
+            # Guarda las imágenes en la subcarpeta correspondiente
+            for key, file in request.FILES.items():
+                with open(os.path.join(panel_dir, file.name), 'wb') as destination:
+                    for chunk in file.chunks():
+                        destination.write(chunk)
+
+            return JsonResponse({'message': f'Imágenes guardadas correctamente en la carpeta panel{panel_numero}'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+
 
 
 
@@ -192,6 +300,7 @@ def ajustar_gamma(imagen, gamma=1.0):
 
 @csrf_exempt
 def entrenar_knn_para_todos_los_ojos(request):
+    
     if request.method == 'POST':
         try:
             # Obtener datos del formulario POST
@@ -203,39 +312,35 @@ def entrenar_knn_para_todos_los_ojos(request):
 
             # Entrenar KNN para el ojo derecho
             knn_derecho = entrenaoKNN(vecinos, panel_numero, 'der', directorio_base)
+            knn_derecho.save('knn_derecho.xml')
+           # os.chmod('knn_derecho.xml', 0o777)
            
             # Entrenar KNN para el ojo izquierdo
-          #  knn_izquierdo = entrenaoKNN(vecinos, panel_numero, 'izq', directorio_base)
+            knn_izquierdo = entrenaoKNN(vecinos, panel_numero, 'izq', directorio_base)
+            knn_izquierdo.save('knn_izquierdo.xml')
+            #os.chmod('knn_izquierdo.xml', 0o777)
 
             return JsonResponse({'status': 'Entrenamiento completado'})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
     return JsonResponse({'status': 'Error en la solicitud'}, status=400)
-
 def entrenaoKNN(vecinos, panel_numero, ojo, directorio_base):
-    clases = [f'ojo{ojo}_panel{panel_numero}_foto{i}' for i in range(1, 4)]
-    etiqueta = 0
+    clases = [f'ojo{ojo}_panel{panel_numero}_foto{i}' for i in range(6)]
+    etiqueta = 1
     trainingdata = None
     trainingLabels = None
-
-    # Define un tamaño común para todas las imágenes (por ejemplo, 50x50)
     tamano_imagen = (50, 50)
 
-    for clase in clases: 
-        image_base_name = f'{clase}.jpg'
+    for clase in clases:
         input_images_path = os.path.join(directorio_base, f'panel{panel_numero}/')
         file_pattern = os.path.join(input_images_path, '*.jpg')
         files_names = glob.glob(file_pattern)
-
-        print(f'Ruta de la carpeta de imágenes: {input_images_path}')
-        print(f'El file_pattern es: {file_pattern}')
-        print(f'El files_names es: {files_names}')
-
+        print('len(clases)',len(clases))
+        print('etiqueta:',etiqueta)
         for fichpath in files_names:
             img = cv2.imread(fichpath)
-            img = cv2.resize(img, tamano_imagen)  # Redimensiona la imagen
-
+            img = cv2.resize(img, tamano_imagen)
             imggray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             imgecu = cv2.equalizeHist(imggray)
             imgecu1d = np.reshape(imgecu, (1, -1))
@@ -246,16 +351,19 @@ def entrenaoKNN(vecinos, panel_numero, ojo, directorio_base):
             else:
                 trainingdata = np.append(trainingdata, imgecu1d.astype(np.float32), 0)
                 trainingLabels = np.append(trainingLabels, np.array([[etiqueta]]).astype(np.float32), 0)
+                
+        # Incrementar la etiqueta después de procesar todas las imágenes de una clase
+        etiqueta += 1
 
-            etiqueta += 1
+    if trainingdata is not None:
+        print('trainingshape:', trainingdata.shape)
 
-        if trainingdata is not None:
-            print(trainingdata.shape)
+        print(trainingLabels)
+        knn = cv2.ml.KNearest_create()
+        knn.train(trainingdata, cv2.ml.ROW_SAMPLE, trainingLabels)
+        ret, result, neighbours, dist = knn.findNearest(trainingdata, k=3)
+        print('resultado prediccion:',result)
 
-    knn = cv2.ml.KNearest_create()
-    knn.train(trainingdata, cv2.ml.ROW_SAMPLE, trainingLabels)
-
-    ret, result, neighbours, dist = knn.findNearest(trainingdata, k=vecinos)
     if trainingLabels is not None:
         correct = np.count_nonzero(result == trainingLabels)
         print(f'Aciertos ojo{ojo} = {correct}')
