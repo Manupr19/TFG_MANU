@@ -6,14 +6,79 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        body {
+            background-color: #e9ecef; /* Color de fondo suave */
+            font-family: 'Arial', sans-serif; /* Fuente moderna */
+        }
         .container {
             padding-top: 50px;
         }
         .form-register {
-            background-color: #f7f7f7;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #9ea2a6; /* Color de fondo más visible */
+            color: white; /* Color del texto en blanco para contraste */
+            text-decoration: none;
+            border-radius: 5px; /* Bordes redondeados */
+            font-weight: bold;
+            transition: background-color 0.3s ease; /* Transición suave al cambiar de color */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra ligera para resaltar el botón */
+            margin-top: 10px;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3; /* Color al pasar el mouse */
+            color: #fff; /* Mantener el texto en blanco al pasar el mouse */
+        }
+
+      
+        h2.text-center {
+            background-color: #4de3d9; /* Color de fondo para el recuadro */
+            color: white; /* Color del texto */
+            padding: 10px; /* Espaciado interno para el recuadro */
+            border-radius: 10px; /* Bordes redondeados para el recuadro */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra ligera para el recuadro */
+            margin-bottom: 30px; /* Espacio debajo del recuadro */
+            font-weight: 500; /* Peso de la fuente para el título */
+        }
+       
+        .form-control {
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+            margin-bottom: 20px;
+        }
+        .btn-primary {
+            background-color:#4de3d9;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 18px;
+            box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #9ea2a6; /* Color de fondo más visible */
+            color: white; /* Color del texto en blanco para contraste */
+            text-decoration: none;
+            border-radius: 5px; /* Bordes redondeados */
+            font-weight: bold;
+            transition: background-color 0.3s ease; /* Transición suave al cambiar de color */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra ligera para resaltar el botón */
+        }
+
+        .back-button:hover {
+            background-color: #0056b3; /* Color al pasar el mouse */
+            color: #fff; /* Mantener el texto en blanco al pasar el mouse */
         }
     </style>
 </head>
@@ -37,4 +102,3 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.min.js"></script>
 </body>
 </html>
-

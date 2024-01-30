@@ -218,8 +218,7 @@
             setTimeout(() => {
                 window.location.href = "/panel";
             }, 2000);
-        }
-        // Asignar el evento de clic a cada panel
+        } // Asignar el evento de clic a cada panel
         const panelesClick = document.querySelectorAll(".letras-panel");
         panelesClick.forEach(panel => {
             panel.addEventListener("click", () => {
@@ -227,6 +226,48 @@
                 mostrarContenidoAmpliado(panelIndex);
             });
         });
+        function tomarFotoYEnviar() {
+        console.log("Foto tomada y enviada al servidor");
+
+        fetch('/actua/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({/* Datos de la foto o cualquier otro dato necesario */})
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Respuesta recibida:", data);
+            // Suponiendo que data.panelSeleccionado contiene el índice del panel a mostrar
+            if(data.panelSeleccionado && data.panelSeleccionado !== 'Ninguno') {
+                mostrarContenidoAmpliado(data.panelSeleccionado);
+            }
+        })
+        .catch(error => {
+            console.error("Error al enviar la foto:", error);
+        });
+    }
+        function getCsrfToken() {
+    let csrfToken = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, 'csrftoken'.length + 1) === ('csrftoken' + '=')) {
+                csrfToken = decodeURIComponent(cookie.substring('csrftoken'.length + 1));
+                break;
+            }
+        }
+    }
+    return csrfToken;
+}
+  // Activar la función tomarFotoYEnviar cuando la página se carga
+  window.onload = function() {
+    setInterval(tomarFotoYEnviar, 2000);  // Cambiado a 2 segundos
+        };
+       
     </script>
 </body>
 

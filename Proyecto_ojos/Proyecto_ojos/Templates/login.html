@@ -1,43 +1,84 @@
-<title>TFG Manu sign in</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<style>
-   body {
-       background-color: #f0f0f0;
-   }
-   .turquoise-box {
-       background-color: #00ced1;
-       padding: 20px;
-       text-align: center;
-       border-radius: 10px;
-       margin-bottom: 20px;
-   }
-   .turquoise-box h4 {
-       color: #ffffff;
-   }
-   .container {
-       display: flex;
-       justify-content: center;
-       align-items: center;
-       flex-direction: column;
-       height: 100vh;
-   }
-   .form-signin {
-       width: 100%;
-       max-width: 330px;
-       padding: 15px;
-       margin: auto;
-       background-color: #f7f7f7; /* Fondo turquesa para el formulario */
-       border-radius: 10px;
-       box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Sombra para darle un efecto elevado */
-   }
-   .back-button {
-       color: red; /* Texto rojo para el botón */
-       font-size: 1.2em; /* Tamaño de fuente más grande */
-   }
-   .register-link {
-       margin-top: 20px; /* Espacio adicional arriba del enlace de registro */
-   }
-</style>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>TFG Manu sign in</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #e9ecef; /* Color de fondo suave */
+            font-family: 'Arial', sans-serif; /* Fuente moderna */
+        }
+        .container {
+            padding-top: 50px;
+        }
+        .form-signin {
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 330px;
+            margin: auto;
+        }
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #9ea2a6; /* Color de fondo más visible */
+            color: white; /* Color del texto en blanco para contraste */
+            text-decoration: none;
+            border-radius: 5px; /* Bordes redondeados */
+            font-weight: bold;
+            transition: background-color 0.3s ease; /* Transición suave al cambiar de color */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra ligera para resaltar el botón */
+            margin-top: -40px;
+            margin-left: -200px;
+            
+        }
+
+        .back-button:hover {
+            background-color: #0056b3; /* Color al pasar el mouse */
+            color: #fff; /* Mantener el texto en blanco al pasar el mouse */
+        }
+
+        h2.text-center {
+            background-color: #4de3d9; /* Color de fondo para el recuadro */
+            color: white; /* Color del texto */
+            padding: 10px; /* Espaciado interno para el recuadro */
+            border-radius: 10px; /* Bordes redondeados para el recuadro */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra ligera para el recuadro */
+            margin-bottom: 30px; /* Espacio debajo del recuadro */
+            font-weight: 500; /* Peso de la fuente para el título */
+        }
+
+        .btn-primary {
+            background-color: #4de3d9;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 18px;
+            box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .form-control {
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+            margin-bottom: 20px;
+        }
+
+        /* Ocultar mensajes de error de Django */
+        .help-block, .errorlist {
+            display: none;
+        }
+
+        .register-link a {
+            color: #4de3d9; /* Color turquesa para el enlace */
+        }
+    </style>
 
 <div class="container">
      {% if messages %}
@@ -52,14 +93,14 @@
       {% csrf_token %}
       <h2 class="text-center">Inicio de sesión</h2>
       <div class="form-group">
-         <label for="username">Username</label>
+         <label for="username">Usuario</label>
          <input class="form-control" type="text" placeholder="Username" name="username" id="username" required autofocus>
       </div>
       <div class="form-group">
-         <label for="password">Password</label>
+         <label for="password">Contraseña</label>
          <input class="form-control" type="password" placeholder="Password" name="password" id="password" required>
       </div>
-      <button class="btn btn-primary btn-block" type="submit">Inicia sesión!</button>
+      <button class="btn btn-primary btn-block" type="submit"> Inicia sesión </button>
       <p class="register-link text-center">¿No tienes cuenta aún? <a href="/registro">REGISTRATE AQUI</a></p>
    </form>
    

@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from django.shortcuts import render
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, authenticate
 from django.shortcuts import render, redirect
 from .forms import UserRegistrationForm
@@ -10,7 +9,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.shortcuts import redirect
-# Create your views here.
+
 
 def panel_view(request):
       if not request.user.is_authenticated:
@@ -24,12 +23,9 @@ def inicio_view(request):
 
 def login_view(request):
     return render(request, 'login.html')
+
 def registro_view(request):
     return render(request, 'registro.html')
-
-
-
-
 
 def register(request):
     if request.method == 'POST':
@@ -51,7 +47,7 @@ def seleccion_panel(request, panel_numero):
     nombre_plantilla = f"seleccionpanel{panel_numero}.html"
     return render(request, nombre_plantilla)
 
-def logeate(request):
+def logueate(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']

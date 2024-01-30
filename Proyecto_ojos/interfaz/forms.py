@@ -5,8 +5,10 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
 class UserRegistrationForm(forms.ModelForm):
-    password = forms.CharField(label='Contraseña', widget=forms.PasswordInput)
-    password_confirm = forms.CharField(label='Confirmar Contraseña', widget=forms.PasswordInput)
+    username = forms.CharField(label='Nombre de Usuario', widget=forms.TextInput(attrs={'class': 'form-control font-weight-bold'}))
+    email = forms.EmailField(label='Correo Electrónico', widget=forms.EmailInput(attrs={'class': 'form-control font-weight-bold'}))
+    password = forms.CharField(label='Contraseña', widget=forms.PasswordInput(attrs={'class': 'form-control font-weight-bold'}))
+    password_confirm = forms.CharField(label='Confirmar Contraseña', widget=forms.PasswordInput(attrs={'class': 'form-control font-weight-bold'}))
 
     class Meta:
         model = User
@@ -17,3 +19,4 @@ class UserRegistrationForm(forms.ModelForm):
         if cd['password'] != cd['password_confirm']:
             raise ValidationError('Las contraseñas no coinciden.')
         return cd['password_confirm']
+

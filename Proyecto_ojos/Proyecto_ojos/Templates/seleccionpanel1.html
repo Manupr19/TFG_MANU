@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Panel 2</title>
+    <title>Panel 1</title>
     <style>
         /* Estilos CSS para el panel */
         .letras-panel {
@@ -155,7 +155,7 @@
         <div class="letras-panel col-lg-2 offset-lg-1 col-sm-3 offset-sm-1" data-panel-index="4">
             <h2>Panel 4</h2>
             <ul class="letras-lista" data-lista-index="4">
-                <!-- Las letras se agregarán aquí dinámicamente con JavaScript -->
+               
             </ul>
         </div>
 
@@ -228,6 +228,48 @@
                 mostrarContenidoAmpliado(panelIndex);
             });
         });
+        function tomarFotoYEnviar() {
+        console.log("Foto tomada y enviada al servidor");
+
+        fetch('/actua/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({/* Datos de la foto o cualquier otro dato necesario */})
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Respuesta recibida:", data);
+            // Suponiendo que data.panelSeleccionado contiene el índice del panel a mostrar
+            if(data.panelSeleccionado && data.panelSeleccionado !== 'Ninguno') {
+                mostrarContenidoAmpliado(data.panelSeleccionado);
+            }
+        })
+        .catch(error => {
+            console.error("Error al enviar la foto:", error);
+        });
+    }
+        function getCsrfToken() {
+    let csrfToken = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, 'csrftoken'.length + 1) === ('csrftoken' + '=')) {
+                csrfToken = decodeURIComponent(cookie.substring('csrftoken'.length + 1));
+                break;
+            }
+        }
+    }
+    return csrfToken;
+}
+  // Activar la función tomarFotoYEnviar cuando la página se carga
+  window.onload = function() {
+            setInterval(tomarFotoYEnviar, 2000); // Cambiado a 2 segundos
+        };
+       
     </script>
 </body>
 

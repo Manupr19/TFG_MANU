@@ -168,28 +168,37 @@
 
         <div class="    offset-lg-4 col-lg-6 col-sm-3 offset-sm-1" data-panel-index="2">
             <h2 id="area-central"></h2> 
-            <button id="btnTomarFoto">Tomar Foto</button>
+            
 
             <script>
                 // Agrega un evento de clic al botón
-                document.getElementById('btnTomarFoto').addEventListener('click', function() {
-                    // Realiza una solicitud POST a la URL 'actua/'
-                    fetch('/actua/', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            // Puedes agregar otros encabezados si es necesario
-                        },
-                        // Puedes enviar datos en el cuerpo de la solicitud si es necesario
-                        body: JSON.stringify({}),
-                    }).then(response => {
-                        // Manejar la respuesta si es necesario
-                        console.log(response);
-                    }).catch(error => {
-                        // Manejar errores si es necesario
-                        console.error(error);
-                    });
-                });
+                function tomarFotoYEnviar() {
+        console.log("Foto tomada y enviada al servidor");
+
+        fetch('/actua/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({/* Datos de la foto o cualquier otro dato necesario */})
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Respuesta recibida:", data);
+            // Actualizar la interfaz de usuario en base a la respuesta
+            if(data.panelSeleccionado && data.panelSeleccionado !== 'Ninguno') {
+                window.location.href = `/seleccionpanel${data.panelSeleccionado}/`;
+            }
+        })
+        .catch(error => {
+            console.error("Error al enviar la foto:", error);
+        });
+    }
+
+    window.onload = function() {
+            setInterval(tomarFotoYEnviar, 2000);
+        };
             </script>
         </div>
 

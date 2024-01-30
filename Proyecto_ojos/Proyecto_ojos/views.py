@@ -16,10 +16,6 @@ def consultarKNN(request, panel_numero):
         knn_izquierdo = cv2.ml.KNearest_load(ruta_izquierdo)
     except Exception as e:
         print("Error al cargar el modelo izquierdo:", e)
-
-    #print(ruta_derecho)
-    #print(ruta_izquierdo)
-   # print(os.getcwd())
     # Construir la ruta de las imágenes basada en el panel_numero
     ruta_ojo_derecho = os.path.join('entrenamiento', 'fotos', 'fotosusuarios', 'fotosnormalizadas', f'panel{panel_numero}', f'ojoder_panel{panel_numero}_foto.jpg')
     ruta_ojo_izquierdo = os.path.join('entrenamiento', 'fotos', 'fotosusuarios', 'fotosnormalizadas', f'panel{panel_numero}', f'ojoizq_panel{panel_numero}_foto.jpg')
@@ -48,7 +44,7 @@ def preparar_y_predicir(knn_modelo, imagen_ojo):
 
     gris = cv2.cvtColor(imagen_ojo, cv2.COLOR_BGR2GRAY)
     ecualizado = cv2.equalizeHist(gris)
-    redimensionado = cv2.resize(ecualizado, (50, 50))  # Asegúrate de que este tamaño coincida con el del entrenamiento
+    redimensionado = cv2.resize(ecualizado, (50, 50))  # Asegurarse de que este tamaño coincida con el del entrenamiento
     vector_1d = np.reshape(redimensionado, (1, -1)).astype(np.float32)
 
     # Guardar la imagen procesada con una extensión de archivo válida
